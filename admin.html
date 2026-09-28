@@ -1,3 +1,4 @@
+You
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +11,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
 body {
   font-family: Arial, sans-serif;
   background: #111827;
@@ -85,10 +85,6 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background: #eab308;
-}
-
 #adminPanel {
   display: none;
 }
@@ -111,7 +107,6 @@ button:hover {
   background: #ef4444;
   color: white;
 }
-
 </style>
 </head>
 
@@ -135,17 +130,8 @@ button:hover {
 
 <h2>🔐 Admin Login</h2>
 
-<input
-  id="email"
-  type="email"
-  placeholder="Admin email"
->
-
-<input
-  id="password"
-  type="password"
-  placeholder="Password"
->
+<input id="email" type="email" placeholder="Admin email">
+<input id="password" type="password" placeholder="Password">
 
 <button onclick="login()">Login</button>
 
@@ -161,305 +147,248 @@ button:hover {
 <h2>📝 Enter Result</h2>
 
 <label>Week</label>
-
 <select id="weekSelect"></select>
 
 <label>Fixture</label>
-
 <select id="fixtureSelect"></select>
 
 <div id="fixtureName" class="fixture-name"></div>
 
 <label>Home Score</label>
-
-<input
-  id="homeScore"
-  type="number"
-  min="0"
-  max="14"
-  placeholder="Home score"
->
+<input id="homeScore" type="number" min="0" max="14">
 
 <label>Away Score</label>
+<input id="awayScore" type="number" min="0" max="14">
 
-<input
-  id="awayScore"
-  type="number"
-  min="0"
-  max="14"
-  placeholder="Away score"
->
-
-<button onclick="saveResult()">
-Save Result
-</button>
+<button onclick="saveResult()">Save Result</button>
 
 <div id="saveMessage" class="message"></div>
 
 </div>
 
+
 <div class="card">
 
-<button class="logout" onclick="logout()">
-Log Out
-</button>
+<h2>📊 Player Stats</h2>
+
+<label>Player Name</label>
+<input id="playerName" type="text" placeholder="Player name">
+
+<label>Team</label>
+<select id="playerTeam"></select>
+
+<label>Total 180s</label>
+<input id="player180s" type="number" min="0" value="0">
+
+<label>Highest Checkout</label>
+<input id="playerCheckout" type="number" min="0" max="170" value="0">
+
+<label>Total Dominoes 3–0s</label>
+<input id="player30s" type="number" min="0" value="0">
+
+<button onclick="savePlayerStats()">Save Player Stats</button>
+
+<div id="statsMessage" class="message"></div>
+
+</div>
+
+
+<div class="card">
+
+<button class="logout" onclick="logout()">Log Out</button>
 
 </div>
 
 </div>
-
 </div>
 
 
 <script>
 
 const SUPABASE_URL =
-  "https://zczdgjwmewgbkgxoqplm.supabase.co";
+"https://zczdgjwmewgbkgxoqplm.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
-
+"sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
 
 const { createClient } = supabase;
 
 const db =
-  createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 const teams = [
-  "Crown A",
-  "Punch",
-  "ICI",
-  "Golden Cup",
-  "The Park Inn",
-  "Bird in Hand",
-  "Victoria A",
-  "Two Gates Club",
-  "Funky Room",
-  "Entwistle",
-  "Crown B",
-  "Victoria B"
+"Crown A",
+"Punch",
+"ICI",
+"Golden Cup",
+"The Park Inn",
+"Bird in Hand",
+"Victoria A",
+"Two Gates Club",
+"Funky Room",
+"Entwistle",
+"Crown B",
+"Victoria B"
 ];
-
 
 let fixtures = [];
 
 
-// ============================
 // LOGIN
-// ============================
 
 async function login() {
 
   const email =
-    document.getElementById("email").value.trim();
+  document.getElementById("email").value.trim();
 
   const password =
-    document.getElementById("password").value;
+  document.getElementById("password").value;
 
   const message =
-    document.getElementById("loginMessage");
+  document.getElementById("loginMessage");
 
-
-  message.textContent =
-    "Logging in...";
-
+  message.textContent = "Logging in...";
 
   const { error } =
-    await db.auth.signInWithPassword({
-
-      email: email,
-      password: password
-
-    });
-
+  await db.auth.signInWithPassword({
+    email,
+    password
+  });
 
   if (error) {
-
     message.textContent =
-      "Login failed: " + error.message;
-
+    "Login failed: " + error.message;
     return;
-
   }
 
-
   message.textContent = "";
-
   showAdmin();
-
 }
 
 
-// ============================
 // LOGOUT
-// ============================
 
 async function logout() {
 
   await db.auth.signOut();
 
   document.getElementById("adminPanel")
-    .style.display = "none";
+  .style.display = "none";
 
   document.getElementById("loginCard")
-    .style.display = "block";
-
+  .style.display = "block";
 }
 
-
-// ============================
-// SHOW ADMIN
-// ============================
 
 function showAdmin() {
 
   document.getElementById("loginCard")
-    .style.display = "none";
+  .style.display = "none";
 
   document.getElementById("adminPanel")
-    .style.display = "block";
-
+  .style.display = "block";
 }
 
-
-// ============================
-// CHECK SESSION
-// ============================
 
 async function checkSession() {
 
   const {
     data: { session }
-  } =
-    await db.auth.getSession();
-
+  } = await db.auth.getSession();
 
   if (session) {
-
     showAdmin();
-
   }
-
 }
 
 
-// ============================
-// FIXTURE HELPERS
-// ============================
+// FIXTURES
 
 function isHome(matches, team) {
 
   const match =
-    matches.find(m =>
-      m.home === team ||
-      m.away === team
-    );
+  matches.find(m =>
+    m.home === team ||
+    m.away === team
+  );
 
   return match.home === team;
-
 }
 
 
 function orientRound(pairs, roundNumber) {
 
   let defaults =
-    pairs.map((pair, index) => {
+  pairs.map((pair, index) => {
 
-      if (
-        (index + roundNumber) % 2 === 0
-      ) {
-
-        return {
-          home: pair[0],
-          away: pair[1]
-        };
-
-      }
+    if ((index + roundNumber) % 2 === 0) {
 
       return {
-        home: pair[1],
-        away: pair[0]
+        home: pair[0],
+        away: pair[1]
       };
 
-    });
+    }
+
+    return {
+      home: pair[1],
+      away: pair[0]
+    };
+
+  });
 
 
   let best = null;
   let bestFlips = 999;
 
 
-  for (
-    let mask = 0;
-    mask < 64;
-    mask++
-  ) {
+  for (let mask = 0; mask < 64; mask++) {
 
     let matches =
-      defaults.map(
-        (match, index) => {
+    defaults.map((match, index) => {
 
-          if (
-            mask & (1 << index)
-          ) {
+      if (mask & (1 << index)) {
 
-            return {
-              home: match.away,
-              away: match.home
-            };
+        return {
+          home: match.away,
+          away: match.home
+        };
 
-          }
+      }
 
-          return {
-            home: match.home,
-            away: match.away
-          };
+      return {
+        home: match.home,
+        away: match.away
+      };
 
-        }
-      );
+    });
 
 
     const crownsOK =
-      isHome(matches, "Crown A") !==
-      isHome(matches, "Crown B");
+    isHome(matches, "Crown A") !==
+    isHome(matches, "Crown B");
 
 
     const victoriasOK =
-      isHome(matches, "Victoria A") !==
-      isHome(matches, "Victoria B");
+    isHome(matches, "Victoria A") !==
+    isHome(matches, "Victoria B");
 
 
-    if (
-      crownsOK &&
-      victoriasOK
-    ) {
+    if (crownsOK && victoriasOK) {
 
       let flips = 0;
 
+      for (let i = 0; i < 6; i++) {
 
-      for (
-        let i = 0;
-        i < 6;
-        i++
-      ) {
-
-        if (
-          mask & (1 << i)
-        ) {
-
+        if (mask & (1 << i)) {
           flips++;
-
         }
 
       }
 
 
-      if (
-        flips < bestFlips
-      ) {
+      if (flips < bestFlips) {
 
         best = matches;
         bestFlips = flips;
@@ -471,30 +400,19 @@ function orientRound(pairs, roundNumber) {
   }
 
   return best;
-
 }
 
 
-// ============================
-// FIRST 11 WEEKS
-// ============================
-
 function generateFirstHalf() {
 
-  const fixedTeam =
-    teams[0];
+  const fixedTeam = teams[0];
 
-  let rotating =
-    teams.slice(1);
+  let rotating = teams.slice(1);
 
   let rounds = [];
 
 
-  for (
-    let round = 0;
-    round < 11;
-    round++
-  ) {
+  for (let round = 0; round < 11; round++) {
 
     const currentTeams = [
       fixedTeam,
@@ -504,11 +422,7 @@ function generateFirstHalf() {
     let pairs = [];
 
 
-    for (
-      let i = 0;
-      i < 6;
-      i++
-    ) {
+    for (let i = 0; i < 6; i++) {
 
       pairs.push([
         currentTeams[i],
@@ -519,87 +433,61 @@ function generateFirstHalf() {
 
 
     rounds.push(
-      orientRound(
-        pairs,
-        round
-      )
+      orientRound(pairs, round)
     );
 
 
-    const last =
-      rotating.pop();
+    const last = rotating.pop();
 
     rotating.unshift(last);
 
   }
 
   return rounds;
-
 }
 
-
-// ============================
-// CREATE 22 WEEKS
-// ============================
 
 function generateFixtures() {
 
   const firstHalf =
-    generateFirstHalf();
+  generateFirstHalf();
 
 
   const secondHalf =
-    firstHalf.map(round =>
+  firstHalf.map(round =>
 
-      round.map(match => ({
+    round.map(match => ({
+      home: match.away,
+      away: match.home
+    }))
 
-        home: match.away,
-        away: match.home
-
-      }))
-
-    );
+  );
 
 
   fixtures = [
     ...firstHalf,
     ...secondHalf
   ];
-
 }
 
-
-// ============================
-// LOAD WEEKS
-// ============================
 
 function loadWeeks() {
 
   const select =
-    document.getElementById(
-      "weekSelect"
-    );
+  document.getElementById("weekSelect");
 
 
-  for (
-    let week = 1;
-    week <= 22;
-    week++
-  ) {
+  for (let week = 1; week <= 22; week++) {
 
     const option =
-      document.createElement(
-        "option"
-      );
+    document.createElement("option");
 
-    option.value =
-      week - 1;
+    option.value = week - 1;
 
     option.textContent =
-      "Week " + week;
+    "Week " + week;
 
     select.appendChild(option);
-
   }
 
 
@@ -607,196 +495,148 @@ function loadWeeks() {
     "change",
     loadFixtures
   );
-
 }
 
-
-// ============================
-// LOAD FIXTURES
-// ============================
 
 function loadFixtures() {
 
   const weekIndex =
-    Number(
-      document.getElementById(
-        "weekSelect"
-      ).value
-    );
+  Number(
+    document.getElementById("weekSelect").value
+  );
 
 
   const select =
-    document.getElementById(
-      "fixtureSelect"
-    );
+  document.getElementById("fixtureSelect");
 
 
   select.innerHTML = "";
 
 
   fixtures[weekIndex]
-    .forEach(
-      (match, index) => {
+  .forEach((match, index) => {
 
-        const option =
-          document.createElement(
-            "option"
-          );
+    const option =
+    document.createElement("option");
 
-        option.value =
-          index;
+    option.value = index;
 
-        option.textContent =
-          match.home +
-          " v " +
-          match.away;
+    option.textContent =
+    match.home + " v " + match.away;
 
-        select.appendChild(
-          option
-        );
+    select.appendChild(option);
 
-      }
-    );
+  });
 
 
   showFixture();
-
 }
 
-
-// ============================
-// SHOW FIXTURE
-// ============================
 
 function showFixture() {
 
   const week =
-    Number(
-      document.getElementById(
-        "weekSelect"
-      ).value
-    );
+  Number(
+    document.getElementById("weekSelect").value
+  );
 
 
   const fixture =
-    Number(
-      document.getElementById(
-        "fixtureSelect"
-      ).value
-    );
+  Number(
+    document.getElementById("fixtureSelect").value
+  );
 
 
   const match =
-    fixtures[week][fixture];
+  fixtures[week][fixture];
 
 
-  document.getElementById(
-    "fixtureName"
-  ).textContent =
-    match.home +
-    " v " +
-    match.away;
-
+  document.getElementById("fixtureName")
+  .textContent =
+  match.home + " v " + match.away;
 }
 
 
-document.getElementById(
-  "fixtureSelect"
-).addEventListener(
+document.getElementById("fixtureSelect")
+.addEventListener(
   "change",
   showFixture
 );
 
 
-// ============================
 // SAVE RESULT
-// ============================
 
 async function saveResult() {
 
   const weekIndex =
-    Number(
-      document.getElementById(
-        "weekSelect"
-      ).value
-    );
+  Number(
+    document.getElementById("weekSelect").value
+  );
 
 
   const fixtureIndex =
-    Number(
-      document.getElementById(
-        "fixtureSelect"
-      ).value
-    );
+  Number(
+    document.getElementById("fixtureSelect").value
+  );
 
 
-  const homeScore =
-    Number(
-      document.getElementById(
-        "homeScore"
-      ).value
-    );
+  const homeValue =
+  document.getElementById("homeScore").value;
 
-
-  const awayScore =
-    Number(
-      document.getElementById(
-        "awayScore"
-      ).value
-    );
+  const awayValue =
+  document.getElementById("awayScore").value;
 
 
   const message =
-    document.getElementById(
-      "saveMessage"
-    );
+  document.getElementById("saveMessage");
 
 
-  if (
-    Number.isNaN(homeScore) ||
-    Number.isNaN(awayScore)
-  ) {
+  if (homeValue === "" || awayValue === "") {
 
     message.textContent =
-      "Enter both scores.";
+    "Enter both scores.";
 
     return;
-
   }
 
 
+  const homeScore =
+  Number(homeValue);
+
+  const awayScore =
+  Number(awayValue);
+
+
   const match =
-    fixtures[weekIndex][fixtureIndex];
+  fixtures[weekIndex][fixtureIndex];
 
 
   const weekNumber =
-    weekIndex + 1;
+  weekIndex + 1;
 
 
-  message.textContent =
-    "Saving...";
+  message.textContent = "Saving...";
 
 
   const {
     data: existing,
     error: checkError
   } =
-    await db
-      .from("results")
-      .select("id")
-      .eq("week", weekNumber)
-      .eq("home_team", match.home)
-      .eq("away_team", match.away)
-      .maybeSingle();
+  await db
+    .from("results")
+    .select("id")
+    .eq("week", weekNumber)
+    .eq("home_team", match.home)
+    .eq("away_team", match.away)
+    .maybeSingle();
 
 
   if (checkError) {
 
     message.textContent =
-      checkError.message;
+    checkError.message;
 
     return;
-
   }
 
 
@@ -806,77 +646,204 @@ async function saveResult() {
   if (existing) {
 
     const response =
-      await db
-        .from("results")
-        .update({
-          home_score: homeScore,
-          away_score: awayScore
-        })
-        .eq(
-          "id",
-          existing.id
-        );
+    await db
+      .from("results")
+      .update({
+        home_score: homeScore,
+        away_score: awayScore
+      })
+      .eq("id", existing.id);
 
-    error =
-      response.error;
+    error = response.error;
 
   } else {
 
     const response =
-      await db
-        .from("results")
-        .insert({
+    await db
+      .from("results")
+      .insert({
+        week: weekNumber,
+        home_team: match.home,
+        away_team: match.away,
+        home_score: homeScore,
+        away_score: awayScore
+      });
 
-          week: weekNumber,
-          home_team: match.home,
-          away_team: match.away,
-          home_score: homeScore,
-          away_score: awayScore
-
-        });
-
-    error =
-      response.error;
-
+    error = response.error;
   }
 
 
   if (error) {
 
     message.textContent =
-      "Error: " +
-      error.message;
+    "Error: " + error.message;
 
     return;
-
   }
 
 
   message.textContent =
-    "✅ Result saved";
+  "✅ Result saved";
 
-
-  document.getElementById(
-    "homeScore"
-  ).value = "";
-
-
-  document.getElementById(
-    "awayScore"
-  ).value = "";
-
+  document.getElementById("homeScore").value = "";
+  document.getElementById("awayScore").value = "";
 }
 
 
-// ============================
-// START
-// ============================
+// LOAD TEAM LIST FOR PLAYER STATS
+
+function loadPlayerTeams() {
+
+  const select =
+  document.getElementById("playerTeam");
+
+
+  teams.forEach(team => {
+
+    const option =
+    document.createElement("option");
+
+    option.value = team;
+    option.textContent = team;
+
+    select.appendChild(option);
+
+  });
+}
+
+
+// SAVE PLAYER STATS
+
+async function savePlayerStats() {
+
+  const playerName =
+  document.getElementById("playerName")
+  .value.trim();
+
+
+  const team =
+  document.getElementById("playerTeam")
+  .value;
+
+
+  const total180s =
+  Number(
+    document.getElementById("player180s").value
+  );
+
+
+  const highestCheckout =
+  Number(
+    document.getElementById("playerCheckout").value
+  );
+
+
+  const dominoes30s =
+  Number(
+    document.getElementById("player30s").value
+  );
+
+
+  const message =
+  document.getElementById("statsMessage");
+
+
+  if (playerName === "") {
+
+    message.textContent =
+    "Enter the player's name.";
+
+    return;
+  }
+
+
+  message.textContent =
+  "Saving stats...";
+
+
+  const {
+    data: existing,
+    error: checkError
+  } =
+  await db
+    .from("player_stats")
+    .select("id")
+    .eq("player_name", playerName)
+    .eq("team", team)
+    .maybeSingle();
+
+
+  if (checkError) {
+
+    message.textContent =
+    "Error: " + checkError.message;
+
+    return;
+  }
+
+
+  let error;
+
+
+  if (existing) {
+
+    const response =
+    await db
+      .from("player_stats")
+      .update({
+        total_180s: total180s,
+        highest_checkout: highestCheckout,
+        dominoes_3_0s: dominoes30s
+      })
+      .eq("id", existing.id);
+
+    error = response.error;
+
+  } else {
+
+    const response =
+    await db
+      .from("player_stats")
+      .insert({
+        player_name: playerName,
+        team: team,
+        total_180s: total180s,
+        highest_checkout: highestCheckout,
+        dominoes_3_0s: dominoes30s
+      });
+
+    error = response.error;
+  }
+
+
+  if (error) {
+
+    message.textContent =
+    "Error: " + error.message;
+
+    return;
+  }
+
+
+  message.textContent =
+  "✅ Player stats saved";
+
+  document.getElementById("playerName").value = "";
+  document.getElementById("player180s").value = 0;
+  document.getElementById("playerCheckout").value = 0;
+  document.getElementById("player30s").value = 0;
+}
+
+
+// START PAGE
 
 generateFixtures();
 
 loadWeeks();
 
 loadFixtures();
+
+loadPlayerTeams();
 
 checkSession();
 
