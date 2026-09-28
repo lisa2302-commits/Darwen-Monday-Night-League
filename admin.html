@@ -119,7 +119,21 @@ button:hover{opacity:.9}
       <button id="saveResultButton" type="button">✅ Save Result</button>
       <div id="saveMessage" class="message"></div>
     </div>
+<div class="card">
 
+<h2>📅 Current League Week</h2>
+
+<label>Select Current Week</label>
+
+<select id="currentWeekSelect"></select>
+
+<button onclick="saveCurrentWeek()">
+✅ Save Current Week
+</button>
+
+<div id="currentWeekMessage" class="message"></div>
+
+</div>
     <div class="card">
       <h2>🛠 Manage Results</h2>
       <button id="loadResultsButton" type="button">Load Saved Results</button>
@@ -451,5 +465,92 @@ loadWeeks();
 loadPlayerTeams();
 checkSession();
 </script>
+ // ============================
+// CURRENT WEEK
+// ============================
+
+async function loadCurrentWeek() {
+
+  const select =
+    document.getElementById("currentWeekSelect");
+
+  select.innerHTML = "";
+
+  for (let week = 1; week <= 22; week++) {
+
+    const option =
+      document.createElement("option");
+
+    option.value = week;
+    option.textContent = "Week " + week;
+
+    select.appendChild(option);
+
+  }
+
+  const { data, error } =
+    await db
+      .from("league_settings")
+      .select("current_week")
+      .eq("id", 1)
+      .single();
+
+  if (error) {
+
+    document.getElementById(
+      "currentWeekMessage"
+    ).textContent =
+      "Unable to load current week.";
+
+    return;
+  }
+
+  select.value =
+    data.current_week;
+
+}
+
+
+// ============================
+// SAVE CURRENT WEEK
+// ============================
+
+async function saveCurrentWeek() {
+
+  const week =
+    Number(
+      document.getElementById(
+        "currentWeekSelect"
+      ).value
+    );
+
+  const message =
+    document.getElementById(
+      "currentWeekMessage"
+    );
+
+  message.textContent =
+    "Saving...";
+
+  const { error } =
+    await db
+      .from("league_settings")
+      .update({
+        current_week: week
+      })
+      .eq("id", 1);
+
+  if (error) {
+
+    message.textContent =
+      "Error: " + error.message;
+
+    return;
+  }
+
+  message.textContent =
+    "✅ Current week set to Week " + week;
+
+}
 </body>
 </html>
