@@ -7,6 +7,8 @@
 
 <title>Results - Monday Nite League</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 
 body {
@@ -80,10 +82,16 @@ td {
   border-bottom: 1px solid #475569;
 }
 
+.score {
+  color: #facc15;
+  font-weight: bold;
+  font-size: 18px;
+}
+
 .message {
   text-align: center;
-  color: #cbd5e1;
   padding: 25px;
+  color: #cbd5e1;
 }
 
 </style>
@@ -109,7 +117,7 @@ td {
 
 <h2>📝 Results</h2>
 
-<table>
+<table id="resultsTable" style="display:none;">
 
 <thead>
 <tr>
@@ -120,17 +128,140 @@ td {
 </tr>
 </thead>
 
-<tbody id="resultsTable"></tbody>
+<tbody id="resultsBody"></tbody>
 
 </table>
 
-<div id="noResults" class="message">
-No results entered yet.
+<div id="message" class="message">
+Loading results...
 </div>
 
 </div>
 
 </div>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://zczdgjwmewgbkgxoqplm.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
+
+const { createClient } = supabase;
+
+const db =
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+async function loadResults() {
+
+  const message =
+    document.getElementById("message");
+
+  const table =
+    document.getElementById("resultsTable");
+
+  const body =
+    document.getElementById("resultsBody");
+
+
+  const { data, error } =
+    await db
+      .from("results")
+      .select("*")
+      .order("week", { ascending: true })
+      .order("id", { ascending: true });
+
+
+  if (error) {
+
+    message.textContent =
+      "Unable to load results: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    message.textContent =
+      "No results entered yet.";
+
+    table.style.display = "none";
+
+    return;
+
+  }
+
+
+  body.innerHTML = "";
+
+
+  data.forEach(result => {
+
+    const row =
+      document.createElement("tr");
+
+    const weekCell =
+      document.createElement("td");
+
+    const homeCell =
+      document.createElement("td");
+
+    const scoreCell =
+      document.createElement("td");
+
+    const awayCell =
+      document.createElement("td");
+
+
+    weekCell.textContent =
+      result.week;
+
+    homeCell.textContent =
+      result.home_team;
+
+    scoreCell.textContent =
+      result.home_score +
+      " - " +
+      result.away_score;
+
+    scoreCell.className =
+      "score";
+
+    awayCell.textContent =
+      result.away_team;
+
+
+    row.appendChild(weekCell);
+    row.appendChild(homeCell);
+    row.appendChild(scoreCell);
+    row.appendChild(awayCell);
+
+    body.appendChild(row);
+
+  });
+
+
+  message.style.display =
+    "none";
+
+  table.style.display =
+    "table";
+
+}
+
+
+loadResults();
+
+</script>
 
 </body>
 </html>
