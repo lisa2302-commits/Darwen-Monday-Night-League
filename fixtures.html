@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fixtures - Monday Nite League</title>
+
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background: #111827;
+  color: white;
+  margin: 0;
+}
+
+header {
+  background: #0f172a;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 3px solid #facc15;
+}
+
+header h1 {
+  margin: 0;
+  color: #facc15;
+}
+
+nav {
+  background: #1e293b;
+  text-align: center;
+  padding: 12px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 8px;
+  font-weight: bold;
+}
+
+nav a:hover {
+  color: #facc15;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 15px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+h2 {
+  text-align: center;
+  color: #facc15;
+}
+
+.week-box {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+select {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #facc15;
+  color: #111827;
+  padding: 12px;
+}
+
+td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #475569;
+}
+
+.home {
+  font-weight: bold;
+}
+
+.vs {
+  color: #facc15;
+  font-weight: bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🎯 Monday Nite Darts & Dominoes League</h1>
+</header>
+
+<nav>
+<a href="index.html">🏆 League</a>
+<a href="fixtures.html">📅 Fixtures</a>
+<a href="results.html">📝 Results</a>
+<a href="stats.html">📊 Stats</a>
+<a href="admin.html">🔐 Admin</a>
+</nav>
+
+<div class="container">
+
+<div class="card">
+
+<h2>📅 Fixtures</h2>
+
+<div class="week-box">
+
+<label for="weekSelect"><strong>Select Week:</strong></label>
+
+<select id="weekSelect"></select>
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Home</th>
+<th></th>
+<th>Away</th>
+</tr>
+</thead>
+
+<tbody id="fixturesTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+const teams = [
+  "Crown A",
+  "Punch",
+  "ICI",
+  "Golden Cup",
+  "The Park Inn",
+  "Bird in Hand",
+  "Victoria A",
+  "Two Gates Club",
+  "Funky Room",
+  "Entwistle",
+  "Crown B",
+  "Victoria B"
+];
+
+let fixtures = [];
+
+
+// ======================================
+// CHECK IF A TEAM IS HOME
+// ======================================
+
+function isHome(matches, team) {
+
+  const match = matches.find(m =>
+    m.home === team || m.away === team
+  );
+
+  return match.home === team;
+}
+
+
+// ======================================
+// ORIENT EACH WEEK
+// Crown A / Crown B opposite home & away
+// Victoria A / Victoria B opposite
+// ======================================
+
+function orientRound(pairs, roundNumber) {
+
+  let defaults = pairs.map((pair, index) => {
+
+    if ((index + roundNumber) % 2 === 0) {
+
+      return {
+        home: pair[0],
+        away: pair[1]
+      };
+
+    } else {
+
+      return {
+        home: pair[1],
+        away: pair[0]
+      };
+
+    }
+
+  });
+
+
+  let best = null;
+  let bestFlips = 999;
+
+
+  for (let mask = 0; mask < 64; mask++) {
+
+    let matches = defaults.map((match, index) => {
+
+      if (mask & (1 << index)) {
+
+        return {
+          home: match.away,
+          away: match.home
+        };
+
+      }
+
+      return {
+        home: match.home,
+        away: match.away
+      };
+
+    });
+
+
+    const crownsOK =
+      isHome(matches, "Crown A") !==
+      isHome(matches, "Crown B");
+
+
+    const victoriasOK =
+      isHome(matches, "Victoria A") !==
+      isHome(matches, "Victoria B");
+
+
+    if (crownsOK && victoriasOK) {
+
+      let flips = 0;
+
+      for (let i = 0; i < 6; i++) {
+
+        if (mask & (1 << i)) {
+          flips++;
+        }
+
+      }
+
+      if (flips < bestFlips) {
+
+        best = matches;
+        bestFlips = flips;
+
+      }
+
+    }
+
+  }
+
+  return best;
+}
+
+
+// ======================================
+// GENERATE 11 WEEKS
+// ======================================
+
+function generateFirstHalf() {
+
+  const fixedTeam = teams[0];
+
+  let rotating = teams.slice(1);
+
+  let rounds = [];
+
+
+  for (let round = 0; round < 11; round++) {
+
+    const currentTeams = [
+      fixedTeam,
+      ...rotating
+    ];
+
+    let pairs = [];
+
+
+    for (let i = 0; i < 6; i++) {
+
+      pairs.push([
+        currentTeams[i],
+        currentTeams[11 - i]
+      ]);
+
+    }
+
+
+    const organisedRound =
+      orientRound(pairs, round);
+
+
+    rounds.push(organisedRound);
+
+
+    const last =
+      rotating.pop();
+
+    rotating.unshift(last);
+
+  }
+
+  return rounds;
+}
+
+
+// ======================================
+// CREATE HOME & AWAY 22 WEEKS
+// ======================================
+
+function generateFixtures() {
+
+  const firstHalf =
+    generateFirstHalf();
+
+
+  const secondHalf =
+    firstHalf.map(round => {
+
+      return round.map(match => {
+
+        return {
+          home: match.away,
+          away: match.home
+        };
+
+      });
+
+    });
+
+
+  fixtures = [
+    ...firstHalf,
+    ...secondHalf
+  ];
+
+}
+
+
+// ======================================
+// LOAD WEEK SELECT
+// ======================================
+
+function loadWeeks() {
+
+  const weekSelect =
+    document.getElementById("weekSelect");
+
+
+  weekSelect.innerHTML = "";
+
+
+  for (let week = 1; week <= 22; week++) {
+
+    const option =
+      document.createElement("option");
+
+    option.value =
+      week - 1;
+
+    option.textContent =
+      "Week " + week;
+
+    weekSelect.appendChild(option);
+
+  }
+
+
+  weekSelect.addEventListener(
+    "change",
+    showFixtures
+  );
+
+}
+
+
+// ======================================
+// SHOW FIXTURES
+// ======================================
+
+function showFixtures() {
+
+  const week =
+    Number(
+      document.getElementById("weekSelect").value
+    );
+
+
+  const table =
+    document.getElementById("fixturesTable");
+
+
+  table.innerHTML = "";
+
+
+  fixtures[week].forEach(match => {
+
+    const row =
+      document.createElement("tr");
+
+
+    row.innerHTML = `
+      <td class="home">${match.home}</td>
+      <td class="vs">V</td>
+      <td>${match.away}</td>
+    `;
+
+
+    table.appendChild(row);
+
+  });
+
+}
+
+
+// ======================================
+// START PAGE
+// ======================================
+
+generateFixtures();
+
+loadWeeks();
+
+showFixtures();
+
+</script>
+
+</body>
+</html>
