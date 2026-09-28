@@ -141,30 +141,39 @@ button {
 
 <div id="adminPanel">
 
+You
 <div class="card">
 
-<h2>📝 Enter Result</h2>
+<h2>🛠 Manage Results</h2>
 
-<label>Week</label>
-<select id="weekSelect"></select>
+<button onclick="loadSavedResults()">
+Load Saved Results
+</button>
 
-<label>Fixture</label>
-<select id="fixtureSelect"></select>
+<label>Saved Result</label>
+<select id="savedResultSelect" onchange="showSavedResult()"></select>
 
-<div id="fixtureName" class="fixture-name"></div>
-
-<label>Home Score</label>
-<input id="homeScore" type="number" min="0" max="14">
-
-<label>Away Score</label>
-<input id="awayScore" type="number" min="0" max="14">
-
-<button onclick="saveResult()">Save Result</button>
-
-<div id="saveMessage" class="message"></div>
-
+<div id="savedResultInfo" class="fixture-name">
+Choose a result to edit or delete.
 </div>
 
+<label>Home Score</label>
+<input id="editHomeScore" type="number" min="0" max="14">
+
+<label>Away Score</label>
+<input id="editAwayScore" type="number" min="0" max="14">
+
+<button onclick="updateSavedResult()">
+✅ Update Result
+</button>
+
+<button class="logout" onclick="deleteSavedResult()">
+🗑 Delete Result
+</button>
+
+<div id="manageResultMessage" class="message"></div>
+
+</div>
 
 <div class="card">
 
@@ -1011,7 +1020,248 @@ async function saveHighestCheckout() {
       "Error: " + error.message;
 
   }
+// ============================
+// MANAGE SAVED RESULTS
+// ============================
 
+let savedResults = [];
+
+async function loadSavedResults() {
+
+  const message =
+    document.getElementById("manageResultMessage");
+
+  const select =
+    document.getElementById("savedResultSelect");
+
+  message.textContent = "Loading...";
+
+  const { data, error } =
+    await db
+      .from("results")
+      .select("*")
+      .order("week", { ascending: true })
+      .order("id", { ascending: true });
+
+  if (error) {
+
+    message.textContent =
+      "Error: " + error.message;
+
+    return;
+  }
+
+  savedResults = data || [];
+
+  select.innerHTML = "";
+
+  if (savedResults.length === 0) {
+
+    message.textContent =
+      "No results saved yet.";
+
+    document.getElementById("savedResultInfo")
+      .textContent = "No results.";
+
+    return;
+  }
+
+  savedResults.forEach(result => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = result.id;
+
+    option.textContent =
+      "Week " +
+      result.week +
+      " - " +
+      result.home_team +
+      " " +
+      result.home_score +
+      " - " +
+      result.away_score +
+      " " +
+      result.away_team;
+
+    select.appendChild(option);
+
+  });
+
+  message.textContent = "";
+
+  showSavedResult();
+}
+
+
+// ============================
+// SHOW SAVED RESULT
+// ============================
+
+function showSavedResult() {
+
+  const id =
+    Number(
+      document.getElementById(
+        "savedResultSelect"
+      ).value
+    );
+
+  const result =
+    savedResults.find(
+      r => Number(r.id) === id
+    );
+
+  if (!result) {
+    return;
+  }
+
+  document.getElementById(
+    "savedResultInfo"
+  ).textContent =
+    "Week " +
+    result.week +
+    ": " +
+    result.home_team +
+    " v " +
+    result.away_team;
+
+  document.getElementById(
+    "editHomeScore"
+  ).value =
+    result.home_score;
+
+  document.getElementById(
+    "editAwayScore"
+  ).value =
+    result.away_score;
+}
+
+
+// ============================
+// UPDATE RESULT
+// ============================
+
+async function updateSavedResult() {
+
+  const id =
+    Number(
+      document.getElementById(
+        "savedResultSelect"
+      ).value
+    );
+
+  const homeScore =
+    Number(
+      document.getElementById(
+        "editHomeScore"
+      ).value
+    );
+
+  const awayScore =
+    Number(
+      document.getElementById(
+        "editAwayScore"
+      ).value
+    );
+
+  const message =
+    document.getElementById(
+      "manageResultMessage"
+    );
+
+  const { error } =
+    await db
+      .from("results")
+      .update({
+        home_score: homeScore,
+        away_score: awayScore
+      })
+      .eq("id", id);
+
+  if (error) {
+
+    message.textContent =
+      "Error: " + error.message;
+
+    return;
+  }
+
+  message.textContent =
+    "✅ Result updated";
+
+  await loadSavedResults();
+}
+
+
+// ============================
+// DELETE RESULT
+// ============================
+
+async function deleteSavedResult() {
+
+  const id =
+    Number(
+      document.getElementById(
+        "savedResultSelect"
+      ).value
+    );
+
+  if (!id) {
+    return;
+  }
+
+  const result =
+    savedResults.find(
+      r => Number(r.id) === id
+    );
+
+  if (!result) {
+    return;
+  }
+
+  const sure =
+    confirm(
+      "Delete " +
+      result.home_team +
+      " " +
+      result.home_score +
+      " - " +
+      result.away_score +
+      " " +
+      result.away_team +
+      "?"
+    );
+
+  if (!sure) {
+    return;
+  }
+
+  const message =
+    document.getElementById(
+      "manageResultMessage"
+    );
+
+  const { error } =
+    await db
+      .from("results")
+      .delete()
+      .eq("id", id);
+
+  if (error) {
+
+    message.textContent =
+      "Error: " + error.message;
+
+    return;
+  }
+
+  message.textContent =
+    "✅ Result deleted";
+
+  await loadSavedResults();
+}
 }
 
 // START PAGE
