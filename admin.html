@@ -10,6 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 body {
   font-family: Arial, sans-serif;
   background: #111827;
@@ -42,6 +43,10 @@ nav a {
   font-weight: bold;
 }
 
+nav a:hover {
+  color: #facc15;
+}
+
 .container {
   max-width: 800px;
   margin: auto;
@@ -58,6 +63,12 @@ nav a {
 h2 {
   color: #facc15;
   text-align: center;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
 }
 
 input,
@@ -84,6 +95,10 @@ button {
   cursor: pointer;
 }
 
+button:hover {
+  opacity: 0.9;
+}
+
 #adminPanel {
   display: none;
 }
@@ -91,6 +106,7 @@ button {
 .message {
   text-align: center;
   margin-top: 12px;
+  font-weight: bold;
 }
 
 .fixture-name {
@@ -99,13 +115,19 @@ button {
   border-radius: 6px;
   text-align: center;
   margin: 10px 0;
-  font-weight: bold;
+  line-height: 1.5;
+}
+
+.danger {
+  background: #ef4444;
+  color: white;
 }
 
 .logout {
   background: #ef4444;
   color: white;
 }
+
 </style>
 </head>
 
@@ -125,23 +147,83 @@ button {
 
 <div class="container">
 
+<!-- LOGIN -->
+
 <div class="card" id="loginCard">
 
 <h2>🔐 Admin Login</h2>
 
-<input id="email" type="email" placeholder="Admin email">
-<input id="password" type="password" placeholder="Password">
+<input
+  id="email"
+  type="email"
+  placeholder="Admin email"
+>
 
-<button onclick="login()">Login</button>
+<input
+  id="password"
+  type="password"
+  placeholder="Password"
+>
+
+<button onclick="login()">
+Login
+</button>
 
 <div id="loginMessage" class="message"></div>
 
 </div>
 
 
+<!-- ADMIN PANEL -->
+
 <div id="adminPanel">
 
-You
+
+<!-- ENTER RESULT -->
+
+<div class="card">
+
+<h2>📝 Enter Result</h2>
+
+<label>Week</label>
+<select id="weekSelect"></select>
+
+<label>Fixture</label>
+<select id="fixtureSelect"></select>
+
+<div id="fixtureName" class="fixture-name"></div>
+
+<label>Home Score</label>
+
+<input
+  id="homeScore"
+  type="number"
+  min="0"
+  max="14"
+  placeholder="Home score"
+>
+
+<label>Away Score</label>
+
+<input
+  id="awayScore"
+  type="number"
+  min="0"
+  max="14"
+  placeholder="Away score"
+>
+
+<button onclick="saveResult()">
+✅ Save Result
+</button>
+
+<div id="saveMessage" class="message"></div>
+
+</div>
+
+
+<!-- MANAGE RESULTS -->
+
 <div class="card">
 
 <h2>🛠 Manage Results</h2>
@@ -151,45 +233,82 @@ Load Saved Results
 </button>
 
 <label>Saved Result</label>
-<select id="savedResultSelect" onchange="showSavedResult()"></select>
 
-<div id="savedResultInfo" class="fixture-name">
-Choose a result to edit or delete.
+<select
+  id="savedResultSelect"
+  onchange="showSavedResult()"
+></select>
+
+<div
+  id="savedResultInfo"
+  class="fixture-name"
+>
+Choose a saved result.
 </div>
 
 <label>Home Score</label>
-<input id="editHomeScore" type="number" min="0" max="14">
+
+<input
+  id="editHomeScore"
+  type="number"
+  min="0"
+  max="14"
+>
 
 <label>Away Score</label>
-<input id="editAwayScore" type="number" min="0" max="14">
+
+<input
+  id="editAwayScore"
+  type="number"
+  min="0"
+  max="14"
+>
 
 <button onclick="updateSavedResult()">
 ✅ Update Result
 </button>
 
-<button class="logout" onclick="deleteSavedResult()">
+<button
+  class="danger"
+  onclick="deleteSavedResult()"
+>
 🗑 Delete Result
 </button>
 
-<div id="manageResultMessage" class="message"></div>
+<div
+  id="manageResultMessage"
+  class="message"
+></div>
 
 </div>
+
+
+<!-- PLAYER STATS -->
 
 <div class="card">
 
 <h2>📊 Player Stats</h2>
 
 <label>Player Name</label>
-<input id="playerName" type="text" placeholder="Player name">
+
+<input
+  id="playerName"
+  type="text"
+  placeholder="Player name"
+>
 
 <label>Team</label>
+
 <select id="playerTeam"></select>
 
 <button onclick="loadPlayerStats()">
 Load Player
 </button>
 
-<div id="currentStats" class="fixture-name">
+<div
+  id="currentStats"
+  class="fixture-name"
+>
 Enter a player name and select their team.
 </div>
 
@@ -202,6 +321,7 @@ Enter a player name and select their team.
 </button>
 
 <label>New Highest Checkout</label>
+
 <input
   id="playerCheckout"
   type="number"
@@ -214,210 +334,335 @@ Enter a player name and select their team.
 🔥 Save Highest Checkout
 </button>
 
-<div id="statsMessage" class="message"></div>
+<div
+  id="statsMessage"
+  class="message"
+></div>
 
 </div>
 
+
+<!-- LOGOUT -->
 
 <div class="card">
 
-<button class="logout" onclick="logout()">Log Out</button>
+<button
+  class="logout"
+  onclick="logout()"
+>
+Log Out
+</button>
 
 </div>
 
 </div>
+
 </div>
 
 
 <script>
 
+// ============================
+// SUPABASE
+// ============================
+
 const SUPABASE_URL =
-"https://zczdgjwmewgbkgxoqplm.supabase.co";
+  "https://zczdgjwmewgbkgxoqplm.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
+  "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
 
 const { createClient } = supabase;
 
 const db =
-createClient(SUPABASE_URL, SUPABASE_KEY);
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
+
+// ============================
+// TEAMS
+// ============================
 
 const teams = [
-"Crown A",
-"Punch",
-"ICI",
-"Golden Cup",
-"The Park Inn",
-"Bird in Hand",
-"Victoria A",
-"Two Gates Club",
-"Funky Room",
-"Entwistle",
-"Crown B",
-"Victoria B"
+  "Crown A",
+  "Punch",
+  "ICI",
+  "Golden Cup",
+  "The Park Inn",
+  "Bird in Hand",
+  "Victoria A",
+  "Two Gates Club",
+  "Funky Room",
+  "Entwistle",
+  "Crown B",
+  "Victoria B"
 ];
 
 let fixtures = [];
 
+let savedResults = [];
 
+
+// ============================
 // LOGIN
+// ============================
 
 async function login() {
 
   const email =
-  document.getElementById("email").value.trim();
+    document.getElementById("email")
+    .value
+    .trim();
 
   const password =
-  document.getElementById("password").value;
+    document.getElementById("password")
+    .value;
 
   const message =
-  document.getElementById("loginMessage");
+    document.getElementById(
+      "loginMessage"
+    );
 
-  message.textContent = "Logging in...";
+  message.textContent =
+    "Logging in...";
 
   const { error } =
-  await db.auth.signInWithPassword({
-    email,
-    password
-  });
+    await db.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
 
   if (error) {
+
     message.textContent =
-    "Login failed: " + error.message;
+      "Login failed: " +
+      error.message;
+
     return;
   }
 
   message.textContent = "";
+
   showAdmin();
+
 }
 
 
+// ============================
+// SHOW ADMIN
+// ============================
+
+function showAdmin() {
+
+  document.getElementById(
+    "loginCard"
+  ).style.display =
+    "none";
+
+  document.getElementById(
+    "adminPanel"
+  ).style.display =
+    "block";
+
+  loadSavedResults();
+
+}
+
+
+// ============================
 // LOGOUT
+// ============================
 
 async function logout() {
 
   await db.auth.signOut();
 
-  document.getElementById("adminPanel")
-  .style.display = "none";
+  document.getElementById(
+    "adminPanel"
+  ).style.display =
+    "none";
 
-  document.getElementById("loginCard")
-  .style.display = "block";
+  document.getElementById(
+    "loginCard"
+  ).style.display =
+    "block";
+
+  document.getElementById(
+    "password"
+  ).value = "";
+
 }
 
 
-function showAdmin() {
-
-  document.getElementById("loginCard")
-  .style.display = "none";
-
-  document.getElementById("adminPanel")
-  .style.display = "block";
-}
-
+// ============================
+// CHECK LOGIN SESSION
+// ============================
 
 async function checkSession() {
 
   const {
     data: { session }
-  } = await db.auth.getSession();
+  } =
+    await db.auth.getSession();
 
   if (session) {
+
     showAdmin();
+
   }
+
 }
 
 
-// FIXTURES
+// ============================
+// FIXTURE HELPERS
+// ============================
 
 function isHome(matches, team) {
 
   const match =
-  matches.find(m =>
-    m.home === team ||
-    m.away === team
-  );
+    matches.find(
+      m =>
+        m.home === team ||
+        m.away === team
+    );
+
+  if (!match) {
+    return false;
+  }
 
   return match.home === team;
+
 }
 
 
-function orientRound(pairs, roundNumber) {
+function orientRound(
+  pairs,
+  roundNumber
+) {
 
-  let defaults =
-  pairs.map((pair, index) => {
+  const defaults =
+    pairs.map(
+      (pair, index) => {
 
-    if ((index + roundNumber) % 2 === 0) {
+        if (
+          (index + roundNumber)
+          % 2 === 0
+        ) {
 
-      return {
-        home: pair[0],
-        away: pair[1]
-      };
+          return {
+            home: pair[0],
+            away: pair[1]
+          };
 
-    }
-
-    return {
-      home: pair[1],
-      away: pair[0]
-    };
-
-  });
-
-
-  let best = null;
-  let bestFlips = 999;
-
-
-  for (let mask = 0; mask < 64; mask++) {
-
-    let matches =
-    defaults.map((match, index) => {
-
-      if (mask & (1 << index)) {
+        }
 
         return {
-          home: match.away,
-          away: match.home
+          home: pair[1],
+          away: pair[0]
         };
 
       }
+    );
 
-      return {
-        home: match.home,
-        away: match.away
-      };
 
-    });
+  let best = null;
+
+  let bestFlips = 999;
+
+
+  for (
+    let mask = 0;
+    mask < 64;
+    mask++
+  ) {
+
+    const matches =
+      defaults.map(
+        (match, index) => {
+
+          if (
+            mask &
+            (1 << index)
+          ) {
+
+            return {
+              home: match.away,
+              away: match.home
+            };
+
+          }
+
+          return {
+            home: match.home,
+            away: match.away
+          };
+
+        }
+      );
 
 
     const crownsOK =
-    isHome(matches, "Crown A") !==
-    isHome(matches, "Crown B");
+      isHome(
+        matches,
+        "Crown A"
+      )
+      !==
+      isHome(
+        matches,
+        "Crown B"
+      );
 
 
     const victoriasOK =
-    isHome(matches, "Victoria A") !==
-    isHome(matches, "Victoria B");
+      isHome(
+        matches,
+        "Victoria A"
+      )
+      !==
+      isHome(
+        matches,
+        "Victoria B"
+      );
 
 
-    if (crownsOK && victoriasOK) {
+    if (
+      crownsOK &&
+      victoriasOK
+    ) {
 
       let flips = 0;
 
-      for (let i = 0; i < 6; i++) {
 
-        if (mask & (1 << i)) {
+      for (
+        let i = 0;
+        i < 6;
+        i++
+      ) {
+
+        if (
+          mask &
+          (1 << i)
+        ) {
+
           flips++;
+
         }
 
       }
 
 
-      if (flips < bestFlips) {
+      if (
+        flips <
+        bestFlips
+      ) {
 
         best = matches;
-        bestFlips = flips;
+
+        bestFlips =
+          flips;
 
       }
 
@@ -426,29 +671,44 @@ function orientRound(pairs, roundNumber) {
   }
 
   return best;
+
 }
 
 
+// ============================
+// FIRST 11 WEEKS
+// ============================
+
 function generateFirstHalf() {
 
-  const fixedTeam = teams[0];
+  const fixedTeam =
+    teams[0];
 
-  let rotating = teams.slice(1);
+  let rotating =
+    teams.slice(1);
 
-  let rounds = [];
+  const rounds = [];
 
 
-  for (let round = 0; round < 11; round++) {
+  for (
+    let round = 0;
+    round < 11;
+    round++
+  ) {
 
     const currentTeams = [
       fixedTeam,
       ...rotating
     ];
 
-    let pairs = [];
+    const pairs = [];
 
 
-    for (let i = 0; i < 6; i++) {
+    for (
+      let i = 0;
+      i < 6;
+      i++
+    ) {
 
       pairs.push([
         currentTeams[i],
@@ -459,824 +719,77 @@ function generateFirstHalf() {
 
 
     rounds.push(
-      orientRound(pairs, round)
+      orientRound(
+        pairs,
+        round
+      )
     );
 
 
-    const last = rotating.pop();
+    const last =
+      rotating.pop();
 
-    rotating.unshift(last);
+    rotating.unshift(
+      last
+    );
 
   }
 
   return rounds;
+
 }
 
+
+// ============================
+// ALL 22 WEEKS
+// ============================
 
 function generateFixtures() {
 
   const firstHalf =
-  generateFirstHalf();
+    generateFirstHalf();
 
 
   const secondHalf =
-  firstHalf.map(round =>
+    firstHalf.map(
+      round =>
 
-    round.map(match => ({
-      home: match.away,
-      away: match.home
-    }))
+        round.map(
+          match => ({
+            home:
+              match.away,
+            away:
+              match.home
+          })
+        )
 
-  );
+    );
 
 
   fixtures = [
     ...firstHalf,
     ...secondHalf
   ];
+
 }
 
+
+// ============================
+// LOAD WEEKS
+// ============================
 
 function loadWeeks() {
 
   const select =
-  document.getElementById("weekSelect");
-
-
-  for (let week = 1; week <= 22; week++) {
-
-    const option =
-    document.createElement("option");
-
-    option.value = week - 1;
-
-    option.textContent =
-    "Week " + week;
-
-    select.appendChild(option);
-  }
-
-
-  select.addEventListener(
-    "change",
-    loadFixtures
-  );
-}
-
-
-function loadFixtures() {
-
-  const weekIndex =
-  Number(
-    document.getElementById("weekSelect").value
-  );
-
-
-  const select =
-  document.getElementById("fixtureSelect");
-
+    document.getElementById(
+      "weekSelect"
+    );
 
   select.innerHTML = "";
 
 
-  fixtures[weekIndex]
-  .forEach((match, index) => {
-
-    const option =
-    document.createElement("option");
-
-    option.value = index;
-
-    option.textContent =
-    match.home + " v " + match.away;
-
-    select.appendChild(option);
-
-  });
-
-
-  showFixture();
-}
-
-
-function showFixture() {
-
-  const week =
-  Number(
-    document.getElementById("weekSelect").value
-  );
-
-
-  const fixture =
-  Number(
-    document.getElementById("fixtureSelect").value
-  );
-
-
-  const match =
-  fixtures[week][fixture];
-
-
-  document.getElementById("fixtureName")
-  .textContent =
-  match.home + " v " + match.away;
-}
-
-
-document.getElementById("fixtureSelect")
-.addEventListener(
-  "change",
-  showFixture
-);
-
-
-// SAVE RESULT
-
-async function saveResult() {
-
-  const weekIndex =
-  Number(
-    document.getElementById("weekSelect").value
-  );
-
-
-  const fixtureIndex =
-  Number(
-    document.getElementById("fixtureSelect").value
-  );
-
-
-  const homeValue =
-  document.getElementById("homeScore").value;
-
-  const awayValue =
-  document.getElementById("awayScore").value;
-
-
-  const message =
-  document.getElementById("saveMessage");
-
-
-  if (homeValue === "" || awayValue === "") {
-
-    message.textContent =
-    "Enter both scores.";
-
-    return;
-  }
-
-
-  const homeScore =
-  Number(homeValue);
-
-  const awayScore =
-  Number(awayValue);
-
-
-  const match =
-  fixtures[weekIndex][fixtureIndex];
-
-
-  const weekNumber =
-  weekIndex + 1;
-
-
-  message.textContent = "Saving...";
-
-
-  const {
-    data: existing,
-    error: checkError
-  } =
-  await db
-    .from("results")
-    .select("id")
-    .eq("week", weekNumber)
-    .eq("home_team", match.home)
-    .eq("away_team", match.away)
-    .maybeSingle();
-
-
-  if (checkError) {
-
-    message.textContent =
-    checkError.message;
-
-    return;
-  }
-
-
-  let error;
-
-
-  if (existing) {
-
-    const response =
-    await db
-      .from("results")
-      .update({
-        home_score: homeScore,
-        away_score: awayScore
-      })
-      .eq("id", existing.id);
-
-    error = response.error;
-
-  } else {
-
-    const response =
-    await db
-      .from("results")
-      .insert({
-        week: weekNumber,
-        home_team: match.home,
-        away_team: match.away,
-        home_score: homeScore,
-        away_score: awayScore
-      });
-
-    error = response.error;
-  }
-
-
-  if (error) {
-
-    message.textContent =
-    "Error: " + error.message;
-
-    return;
-  }
-
-
-  message.textContent =
-  "✅ Result saved";
-
-  document.getElementById("homeScore").value = "";
-  document.getElementById("awayScore").value = "";
-}
-
-
-// LOAD TEAM LIST FOR PLAYER STATS
-
-function loadPlayerTeams() {
-
-  const select =
-  document.getElementById("playerTeam");
-
-
-  teams.forEach(team => {
-
-    const option =
-    document.createElement("option");
-
-    option.value = team;
-    option.textContent = team;
-
-    select.appendChild(option);
-
-  });
-}
-
-
-// SAVE PLAYER STATS
-
-// ============================
-// FIND PLAYER
-// ============================
-
-async function getPlayer() {
-
-  const playerName =
-    document.getElementById("playerName")
-    .value.trim();
-
-  const team =
-    document.getElementById("playerTeam")
-    .value;
-
-  if (playerName === "") {
-    return null;
-  }
-
-  const {
-    data,
-    error
-  } =
-  await db
-    .from("player_stats")
-    .select("*")
-    .eq("player_name", playerName)
-    .eq("team", team)
-    .maybeSingle();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
-}
-
-
-// ============================
-// CREATE PLAYER IF NEEDED
-// ============================
-
-async function createPlayerIfNeeded() {
-
-  let player =
-    await getPlayer();
-
-  if (player) {
-    return player;
-  }
-
-  const playerName =
-    document.getElementById("playerName")
-    .value.trim();
-
-  const team =
-    document.getElementById("playerTeam")
-    .value;
-
-  if (playerName === "") {
-    throw new Error("Enter the player's name.");
-  }
-
-  const {
-    data,
-    error
-  } =
-  await db
-    .from("player_stats")
-    .insert({
-      player_name: playerName,
-      team: team,
-      total_180s: 0,
-      highest_checkout: 0,
-      dominoes_3_0s: 0
-    })
-    .select()
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
-}
-
-
-// ============================
-// LOAD PLAYER STATS
-// ============================
-
-async function loadPlayerStats() {
-
-  const message =
-    document.getElementById("statsMessage");
-
-  const box =
-    document.getElementById("currentStats");
-
-  try {
-
-    const player =
-      await getPlayer();
-
-    if (!player) {
-
-      box.textContent =
-        "New player — no stats entered yet.";
-
-      message.textContent = "";
-
-      return;
-    }
-
-    box.innerHTML =
-      "🎯 180s: <strong>" +
-      player.total_180s +
-      "</strong><br><br>" +
-
-      "🔥 Highest Checkout: <strong>" +
-      player.highest_checkout +
-      "</strong><br><br>" +
-
-      "🁫 Dominoes 3–0s: <strong>" +
-      player.dominoes_3_0s +
-      "</strong>";
-
-    message.textContent = "";
-
-  }
-
-  catch (error) {
-
-    message.textContent =
-      "Error: " + error.message;
-
-  }
-
-}
-
-
-// ============================
-// ADD +1 STAT
-// ============================
-
-async function addStat(field) {
-
-  const message =
-    document.getElementById("statsMessage");
-
-  try {
-
-    const player =
-      await createPlayerIfNeeded();
-
-    const current =
-      Number(player[field] || 0);
-
-    const newTotal =
-      current + 1;
-
-    const updateData = {};
-
-    updateData[field] =
-      newTotal;
-
-    const { error } =
-      await db
-        .from("player_stats")
-        .update(updateData)
-        .eq("id", player.id);
-
-    if (error) {
-      throw error;
-    }
-
-    if (field === "total_180s") {
-
-      message.textContent =
-        "✅ 180 added";
-
-    } else {
-
-      message.textContent =
-        "✅ Dominoes 3–0 added";
-
-    }
-
-    await loadPlayerStats();
-
-  }
-
-  catch (error) {
-
-    message.textContent =
-      "Error: " + error.message;
-
-  }
-
-}
-
-
-// ============================
-// SAVE HIGHEST CHECKOUT
-// ============================
-
-async function saveHighestCheckout() {
-
-  const message =
-    document.getElementById("statsMessage");
-
-  const checkout =
-    Number(
-      document.getElementById(
-        "playerCheckout"
-      ).value
-    );
-
-  if (
-    !checkout ||
-    checkout < 1 ||
-    checkout > 170
+  for (
+    let week = 1;
+    week <= 22;
+    week++
   ) {
-
-    message.textContent =
-      "Enter a checkout between 1 and 170.";
-
-    return;
-  }
-
-  try {
-
-    const player =
-      await createPlayerIfNeeded();
-
-    const currentCheckout =
-      Number(
-        player.highest_checkout || 0
-      );
-
-    if (
-      checkout <= currentCheckout
-    ) {
-
-      message.textContent =
-        "Current highest checkout is " +
-        currentCheckout +
-        ". Nothing changed.";
-
-      return;
-    }
-
-    const { error } =
-      await db
-        .from("player_stats")
-        .update({
-          highest_checkout: checkout
-        })
-        .eq("id", player.id);
-
-    if (error) {
-      throw error;
-    }
-
-    message.textContent =
-      "✅ New highest checkout saved";
-
-    document.getElementById(
-      "playerCheckout"
-    ).value = "";
-
-    await loadPlayerStats();
-
-  }
-
-  catch (error) {
-
-    message.textContent =
-      "Error: " + error.message;
-  }
-  }
-// ============================
-// MANAGE SAVED RESULTS
-// ============================
-
-let savedResults = [];
-
-async function loadSavedResults() {
-
-  const message =
-    document.getElementById("manageResultMessage");
-
-  const select =
-    document.getElementById("savedResultSelect");
-
-  message.textContent = "Loading...";
-
-  const { data, error } =
-    await db
-      .from("results")
-      .select("*")
-      .order("week", { ascending: true })
-      .order("id", { ascending: true });
-
-  if (error) {
-
-    message.textContent =
-      "Error: " + error.message;
-
-    return;
-  }
-
-  savedResults = data || [];
-
-  select.innerHTML = "";
-
-  if (savedResults.length === 0) {
-
-    message.textContent =
-      "No results saved yet.";
-
-    document.getElementById("savedResultInfo")
-      .textContent = "No results.";
-
-    return;
-  }
-
-  savedResults.forEach(result => {
-
-    const option =
-      document.createElement("option");
-
-    option.value = result.id;
-
-    option.textContent =
-      "Week " +
-      result.week +
-      " - " +
-      result.home_team +
-      " " +
-      result.home_score +
-      " - " +
-      result.away_score +
-      " " +
-      result.away_team;
-
-    select.appendChild(option);
-
-  });
-
-  message.textContent = "";
-
-  showSavedResult();
-}
-
-
-// ============================
-// SHOW SAVED RESULT
-// ============================
-
-function showSavedResult() {
-
-  const id =
-    Number(
-      document.getElementById(
-        "savedResultSelect"
-      ).value
-    );
-
-  const result =
-    savedResults.find(
-      r => Number(r.id) === id
-    );
-
-  if (!result) {
-    return;
-  }
-
-  document.getElementById(
-    "savedResultInfo"
-  ).textContent =
-    "Week " +
-    result.week +
-    ": " +
-    result.home_team +
-    " v " +
-    result.away_team;
-
-  document.getElementById(
-    "editHomeScore"
-  ).value =
-    result.home_score;
-
-  document.getElementById(
-    "editAwayScore"
-  ).value =
-    result.away_score;
-}
-
-
-// ============================
-// UPDATE RESULT
-// ============================
-
-async function updateSavedResult() {
-
-  const id =
-    Number(
-      document.getElementById(
-        "savedResultSelect"
-      ).value
-    );
-
-  const homeScore =
-    Number(
-      document.getElementById(
-        "editHomeScore"
-      ).value
-    );
-
-  const awayScore =
-    Number(
-      document.getElementById(
-        "editAwayScore"
-      ).value
-    );
-
-  const message =
-    document.getElementById(
-      "manageResultMessage"
-    );
-
-  const { error } =
-    await db
-      .from("results")
-      .update({
-        home_score: homeScore,
-        away_score: awayScore
-      })
-      .eq("id", id);
-
-  if (error) {
-
-    message.textContent =
-      "Error: " + error.message;
-
-    return;
-  }
-
-  message.textContent =
-    "✅ Result updated";
-
-  await loadSavedResults();
-}
-
-
-// ============================
-// DELETE RESULT
-// ============================
-
-async function deleteSavedResult() {
-
-  const id =
-    Number(
-      document.getElementById(
-        "savedResultSelect"
-      ).value
-    );
-
-  if (!id) {
-    return;
-  }
-
-  const result =
-    savedResults.find(
-      r => Number(r.id) === id
-    );
-
-  if (!result) {
-    return;
-  }
-
-  const sure =
-    confirm(
-      "Delete " +
-      result.home_team +
-      " " +
-      result.home_score +
-      " - " +
-      result.away_score +
-      " " +
-      result.away_team +
-      "?"
-    );
-
-  if (!sure) {
-    return;
-  }
-
-  const message =
-    document.getElementById(
-      "manageResultMessage"
-    );
-
-  const { error } =
-    await db
-      .from("results")
-      .delete()
-      .eq("id", id);
-
-  if (error) {
-
-    message.textContent =
-      "Error: " + error.message;
-
-    return;
-  }
-
-  message.textContent =
-    "✅ Result deleted";
-
-  await loadSavedResults();
-}
-}
-
-// START PAGE
-
-generateFixtures();
-
-loadWeeks();
-
-loadFixtures();
-
-loadPlayerTeams();
-
-checkSession();
-
-</script>
-
-</body>
-</html>
