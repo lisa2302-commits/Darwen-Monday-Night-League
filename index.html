@@ -2,11 +2,12 @@
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Monday Nite Darts & Dominoes League</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
@@ -42,6 +43,10 @@ nav a {
   font-weight: bold;
 }
 
+nav a:hover {
+  color: #facc15;
+}
+
 .container {
   max-width: 1000px;
   margin: auto;
@@ -57,6 +62,7 @@ nav a {
 
 h2 {
   text-align: center;
+  color: #facc15;
 }
 
 table {
@@ -86,8 +92,13 @@ td:nth-child(2) {
   font-weight: bold;
 }
 
-</style>
+.message {
+  text-align: center;
+  padding: 15px;
+  color: #cbd5e1;
+}
 
+</style>
 </head>
 
 <body>
@@ -113,7 +124,6 @@ td:nth-child(2) {
 <table>
 
 <thead>
-
 <tr>
 <th>Pos</th>
 <th>Team</th>
@@ -123,12 +133,15 @@ td:nth-child(2) {
 <th>L</th>
 <th>Pts</th>
 </tr>
-
 </thead>
 
 <tbody id="leagueTable"></tbody>
 
 </table>
+
+<div id="message" class="message">
+Loading league table...
+</div>
 
 </div>
 
@@ -136,43 +149,182 @@ td:nth-child(2) {
 
 <script>
 
+const SUPABASE_URL =
+  "https://zczdgjwmewgbkgxoqplm.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
+
+const { createClient } = supabase;
+
+const db =
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
 const teams = [
-"Crown A",
-"Punch",
-"ICI",
-"Golden Cup",
-"The Park Inn",
-"Bird in Hand",
-"Victoria A",
-"Two Gates Club",
-"Funky Room",
-"Entwistle",
-"Crown B",
-"Victoria B"
+  "Crown A",
+  "Punch",
+  "ICI",
+  "Golden Cup",
+  "The Park Inn",
+  "Bird in Hand",
+  "Victoria A",
+  "Two Gates Club",
+  "Funky Room",
+  "Entwistle",
+  "Crown B",
+  "Victoria B"
 ];
 
-const table = document.getElementById("leagueTable");
 
-teams.forEach((team, index) => {
+async function loadLeagueTable() {
 
-const row = document.createElement("tr");
+  const table =
+    document.getElementById("leagueTable");
 
-row.innerHTML = `
-<td class="position">${index + 1}</td>
-<td>${team}</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-`;
+  const message =
+    document.getElementById("message");
 
-table.appendChild(row);
 
-});
+  const league =
+    teams.map(team => ({
+      team: team,
+      played: 0,
+      won: 0,
+      drawn: 0,
+      lost: 0,
+      points: 0
+    }));
+
+
+  const { data, error } =
+    await db
+      .from("results")
+      .select("*");
+
+
+  if (error) {
+
+    message.textContent =
+      "Unable to load table: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  data.forEach(result => {
+
+    const home =
+      league.find(
+        t => t.team === result.home_team
+      );
+
+    const away =
+      league.find(
+        t => t.team === result.away_team
+      );
+
+
+    if (!home || !away) {
+      return;
+    }
+
+
+    home.played++;
+    away.played++;
+
+
+    home.points +=
+      Number(result.home_score);
+
+    away.points +=
+      Number(result.away_score);
+
+
+    if (
+      result.home_score >
+      result.away_score
+    ) {
+
+      home.won++;
+      away.lost++;
+
+    }
+
+    else if (
+      result.home_score <
+      result.away_score
+    ) {
+
+      away.won++;
+      home.lost++;
+
+    }
+
+    else {
+
+      home.drawn++;
+      away.drawn++;
+
+    }
+
+  });
+
+
+  league.sort((a, b) => {
+
+    if (b.points !== a.points) {
+      return b.points - a.points;
+    }
+
+    if (b.won !== a.won) {
+      return b.won - a.won;
+    }
+
+    return a.team.localeCompare(b.team);
+
+  });
+
+
+  table.innerHTML = "";
+
+
+  league.forEach((team, index) => {
+
+    const row =
+      document.createElement("tr");
+
+
+    row.innerHTML = `
+      <td class="position">${index + 1}</td>
+      <td>${team.team}</td>
+      <td>${team.played}</td>
+      <td>${team.won}</td>
+      <td>${team.drawn}</td>
+      <td>${team.lost}</td>
+      <td><strong>${team.points}</strong></td>
+    `;
+
+
+    table.appendChild(row);
+
+  });
+
+
+  message.style.display =
+    "none";
+
+}
+
+
+loadLeagueTable();
 
 </script>
 
 </body>
-
 </html>
