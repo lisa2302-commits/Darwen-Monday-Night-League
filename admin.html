@@ -176,16 +176,34 @@ button {
 <label>Team</label>
 <select id="playerTeam"></select>
 
-<label>Total 180s</label>
-<input id="player180s" type="number" min="0" value="0">
+<button onclick="loadPlayerStats()">
+Load Player
+</button>
 
-<label>Highest Checkout</label>
-<input id="playerCheckout" type="number" min="0" max="170" value="0">
+<div id="currentStats" class="fixture-name">
+Enter a player name and select their team.
+</div>
 
-<label>Total Dominoes 3–0s</label>
-<input id="player30s" type="number" min="0" value="0">
+<button onclick="addStat('total_180s')">
+🎯 +1 180
+</button>
 
-<button onclick="savePlayerStats()">Save Player Stats</button>
+<button onclick="addStat('dominoes_3_0s')">
+🁫 +1 Dominoes 3–0
+</button>
+
+<label>New Highest Checkout</label>
+<input
+  id="playerCheckout"
+  type="number"
+  min="1"
+  max="170"
+  placeholder="e.g. 120"
+>
+
+<button onclick="saveHighestCheckout()">
+🔥 Save Highest Checkout
+</button>
 
 <div id="statsMessage" class="message"></div>
 
