@@ -731,126 +731,288 @@ function loadPlayerTeams() {
 
 // SAVE PLAYER STATS
 
-async function savePlayerStats() {
+// ============================
+// FIND PLAYER
+// ============================
+
+async function getPlayer() {
 
   const playerName =
-  document.getElementById("playerName")
-  .value.trim();
-
+    document.getElementById("playerName")
+    .value.trim();
 
   const team =
-  document.getElementById("playerTeam")
-  .value;
-
-
-  const total180s =
-  Number(
-    document.getElementById("player180s").value
-  );
-
-
-  const highestCheckout =
-  Number(
-    document.getElementById("playerCheckout").value
-  );
-
-
-  const dominoes30s =
-  Number(
-    document.getElementById("player30s").value
-  );
-
-
-  const message =
-  document.getElementById("statsMessage");
-
+    document.getElementById("playerTeam")
+    .value;
 
   if (playerName === "") {
-
-    message.textContent =
-    "Enter the player's name.";
-
-    return;
+    return null;
   }
 
-
-  message.textContent =
-  "Saving stats...";
-
-
   const {
-    data: existing,
-    error: checkError
+    data,
+    error
   } =
   await db
     .from("player_stats")
-    .select("id")
+    .select("*")
     .eq("player_name", playerName)
     .eq("team", team)
     .maybeSingle();
 
-
-  if (checkError) {
-
-    message.textContent =
-    "Error: " + checkError.message;
-
-    return;
-  }
-
-
-  let error;
-
-
-  if (existing) {
-
-    const response =
-    await db
-      .from("player_stats")
-      .update({
-        total_180s: total180s,
-        highest_checkout: highestCheckout,
-        dominoes_3_0s: dominoes30s
-      })
-      .eq("id", existing.id);
-
-    error = response.error;
-
-  } else {
-
-    const response =
-    await db
-      .from("player_stats")
-      .insert({
-        player_name: playerName,
-        team: team,
-        total_180s: total180s,
-        highest_checkout: highestCheckout,
-        dominoes_3_0s: dominoes30s
-      });
-
-    error = response.error;
-  }
-
-
   if (error) {
-
-    message.textContent =
-    "Error: " + error.message;
-
-    return;
+    throw error;
   }
 
-
-  message.textContent =
-  "✅ Player stats saved";
-
-  document.getElementById("playerName").value = "";
-  document.getElementById("player180s").value = 0;
-  document.getElementById("playerCheckout").value = 0;
-  document.getElementById("player30s").value = 0;
+  return data;
 }
 
+
+// ============================
+// CREATE PLAYER IF NEEDED
+// ============================
+
+async function createPlayerIfNeeded() {
+
+  let player =
+    await getPlayer();
+
+  if (player) {
+    return player;
+  }
+
+  const playerName =
+    document.getElementById("playerName")
+    .value.trim();
+
+  const team =
+    document.getElementById("playerTeam")
+    .value;
+
+  if (playerName === "") {
+    throw new Error("Enter the player's name.");
+  }
+
+  const {
+    data,
+    error
+  } =
+  await db
+    .from("player_stats")
+    .insert({
+      player_name: playerName,
+      team: team,
+      total_180s: 0,
+      highest_checkout: 0,
+      dominoes_3_0s: 0
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+
+// ============================
+// LOAD PLAYER STATS
+// ============================
+
+async function loadPlayerStats() {
+
+  const message =
+    document.getElementById("statsMessage");
+
+  const box =
+    document.getElementById("currentStats");
+
+  try {
+
+    const player =
+      await getPlayer();
+
+    if (!player) {
+
+      box.textContent =
+        "New player — no stats entered yet.";
+
+      message.textContent = "";
+
+      return;
+    }
+
+    box.innerHTML =
+      "🎯 180s: <strong>" +
+      player.total_180s +
+      "</strong><br><br>" +
+
+      "🔥 Highest Checkout: <strong>" +
+      player.highest_checkout +
+      "</strong><br><br>" +
+
+      "🁫 Dominoes 3–0s: <strong>" +
+      player.dominoes_3_0s +
+      "</strong>";
+
+    message.textContent = "";
+
+  }
+
+  catch (error) {
+
+    message.textContent =
+      "Error: " + error.message;
+
+  }
+
+}
+
+
+// ============================
+// ADD +1 STAT
+// ============================
+
+async function addStat(field) {
+
+  const message =
+    document.getElementById("statsMessage");
+
+  try {
+
+    const player =
+      await createPlayerIfNeeded();
+
+    const current =
+      Number(player[field] || 0);
+
+    const newTotal =
+      current + 1;
+
+    const updateData = {};
+
+    updateData[field] =
+      newTotal;
+
+    const { error } =
+      await db
+        .from("player_stats")
+        .update(updateData)
+        .eq("id", player.id);
+
+    if (error) {
+      throw error;
+    }
+
+    if (field === "total_180s") {
+
+      message.textContent =
+        "✅ 180 added";
+
+    } else {
+
+      message.textContent =
+        "✅ Dominoes 3–0 added";
+
+    }
+
+    await loadPlayerStats();
+
+  }
+
+  catch (error) {
+
+    message.textContent =
+      "Error: " + error.message;
+
+  }
+
+}
+
+
+// ============================
+// SAVE HIGHEST CHECKOUT
+// ============================
+
+async function saveHighestCheckout() {
+
+  const message =
+    document.getElementById("statsMessage");
+
+  const checkout =
+    Number(
+      document.getElementById(
+        "playerCheckout"
+      ).value
+    );
+
+  if (
+    !checkout ||
+    checkout < 1 ||
+    checkout > 170
+  ) {
+
+    message.textContent =
+      "Enter a checkout between 1 and 170.";
+
+    return;
+  }
+
+  try {
+
+    const player =
+      await createPlayerIfNeeded();
+
+    const currentCheckout =
+      Number(
+        player.highest_checkout || 0
+      );
+
+    if (
+      checkout <= currentCheckout
+    ) {
+
+      message.textContent =
+        "Current highest checkout is " +
+        currentCheckout +
+        ". Nothing changed.";
+
+      return;
+    }
+
+    const { error } =
+      await db
+        .from("player_stats")
+        .update({
+          highest_checkout: checkout
+        })
+        .eq("id", player.id);
+
+    if (error) {
+      throw error;
+    }
+
+    message.textContent =
+      "✅ New highest checkout saved";
+
+    document.getElementById(
+      "playerCheckout"
+    ).value = "";
+
+    await loadPlayerStats();
+
+  }
+
+  catch (error) {
+
+    message.textContent =
+      "Error: " + error.message;
+
+  }
+
+}
 
 // START PAGE
 
