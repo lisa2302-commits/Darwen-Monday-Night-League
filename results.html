@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Results - Monday Nite League</title>
+
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background: #111827;
+  color: white;
+  margin: 0;
+}
+
+header {
+  background: #0f172a;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 3px solid #facc15;
+}
+
+header h1 {
+  margin: 0;
+  color: #facc15;
+}
+
+nav {
+  background: #1e293b;
+  text-align: center;
+  padding: 12px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 8px;
+  font-weight: bold;
+}
+
+nav a:hover {
+  color: #facc15;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 15px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+h2 {
+  text-align: center;
+  color: #facc15;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #facc15;
+  color: #111827;
+  padding: 10px;
+}
+
+td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #475569;
+}
+
+.message {
+  text-align: center;
+  color: #cbd5e1;
+  padding: 25px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🎯 Monday Nite Darts & Dominoes League</h1>
+</header>
+
+<nav>
+<a href="index.html">🏆 League</a>
+<a href="fixtures.html">📅 Fixtures</a>
+<a href="results.html">📝 Results</a>
+<a href="stats.html">📊 Stats</a>
+<a href="admin.html">🔐 Admin</a>
+</nav>
+
+<div class="container">
+
+<div class="card">
+
+<h2>📝 Results</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Week</th>
+<th>Home</th>
+<th>Score</th>
+<th>Away</th>
+</tr>
+</thead>
+
+<tbody id="resultsTable"></tbody>
+
+</table>
+
+<div id="noResults" class="message">
+No results entered yet.
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
