@@ -175,29 +175,53 @@ Loading checkouts...
 
 </div>
 
+
+<div class="card">
+
+<h2>🁫 Most Dominoes 3–0s</h2>
+
+<table id="dominoesTable" style="display:none;">
+
+<thead>
+<tr>
+<th>Pos</th>
+<th>Player</th>
+<th>Team</th>
+<th>3–0s</th>
+</tr>
+</thead>
+
+<tbody id="dominoesBody"></tbody>
+
+</table>
+
+<div id="dominoesMessage" class="message">
+Loading dominoes 3–0s...
+</div>
+
+</div>
+
 </div>
 
 
 <script>
 
 const SUPABASE_URL =
-  "https://zczdgjwmewgbkgxoqplm.supabase.co";
+"https://zczdgjwmewgbkgxoqplm.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
+"sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
 
 const { createClient } = supabase;
 
 const db =
-  createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
 
-// ===============================
-// LOAD PLAYER STATS
-// ===============================
+// LOAD ALL STATS
 
 async function loadStats() {
 
@@ -205,78 +229,63 @@ async function loadStats() {
     data,
     error
   } =
-    await db
-      .from("player_stats")
-      .select("*");
+  await db
+    .from("player_stats")
+    .select("*");
 
 
   if (error) {
 
     document.getElementById("message180")
-      .textContent =
-      "No stats entered yet.";
+    .textContent =
+    "Unable to load stats.";
 
     document.getElementById("checkoutMessage")
-      .textContent =
-      "No stats entered yet.";
+    .textContent =
+    "Unable to load stats.";
+
+    document.getElementById("dominoesMessage")
+    .textContent =
+    "Unable to load stats.";
 
     return;
-
   }
 
 
-  if (!data || data.length === 0) {
-
-    document.getElementById("message180")
-      .textContent =
-      "No 180s entered yet.";
-
-    document.getElementById("checkoutMessage")
-      .textContent =
-      "No checkouts entered yet.";
-
-    return;
-
-  }
-
-
-  show180s(data);
-
-  showCheckouts(data);
+  show180s(data || []);
+  showCheckouts(data || []);
+  showDominoes(data || []);
 
 }
 
 
-// ===============================
 // MOST 180s
-// ===============================
 
 function show180s(data) {
 
   const players =
-    [...data]
-      .filter(player =>
-        Number(player.total_180s) > 0
-      )
-      .sort((a, b) =>
-        Number(b.total_180s) -
-        Number(a.total_180s)
-      );
+  [...data]
+  .filter(player =>
+    Number(player.total_180s) > 0
+  )
+  .sort((a, b) =>
+    Number(b.total_180s) -
+    Number(a.total_180s)
+  );
 
 
   if (players.length === 0) {
 
     document.getElementById("message180")
-      .textContent =
-      "No 180s entered yet.";
+    .textContent =
+    "No 180s entered yet.";
 
     return;
-
   }
 
 
   const body =
-    document.getElementById("body180");
+  document.getElementById("body180");
 
   body.innerHTML = "";
 
@@ -284,48 +293,14 @@ function show180s(data) {
   players.forEach((player, index) => {
 
     const row =
-      document.createElement("tr");
+    document.createElement("tr");
 
-
-    const pos =
-      document.createElement("td");
-
-    const name =
-      document.createElement("td");
-
-    const team =
-      document.createElement("td");
-
-    const score =
-      document.createElement("td");
-
-
-    pos.textContent =
-      index + 1;
-
-    pos.className =
-      "position";
-
-
-    name.textContent =
-      player.player_name;
-
-
-    team.textContent =
-      player.team;
-
-
-    score.textContent =
-      player.total_180s;
-
-    score.className =
-      "stat-number";
-
-
-    row.appendChild(pos);
-    row.appendChild(name);
-    row.appendChild(team);
-    row.appendChild(score);
+    row.innerHTML = `
+      <td class="position">${index + 1}</td>
+      <td>${player.player_name}</td>
+      <td>${player.team}</td>
+      <td class="stat-number">${player.total_180s}</td>
+    `;
 
     body.appendChild(row);
 
@@ -333,46 +308,41 @@ function show180s(data) {
 
 
   document.getElementById("message180")
-    .style.display =
-    "none";
+  .style.display = "none";
 
   document.getElementById("table180")
-    .style.display =
-    "table";
+  .style.display = "table";
 
 }
 
 
-// ===============================
 // HIGHEST CHECKOUT
-// ===============================
 
 function showCheckouts(data) {
 
   const players =
-    [...data]
-      .filter(player =>
-        Number(player.highest_checkout) > 0
-      )
-      .sort((a, b) =>
-        Number(b.highest_checkout) -
-        Number(a.highest_checkout)
-      );
+  [...data]
+  .filter(player =>
+    Number(player.highest_checkout) > 0
+  )
+  .sort((a, b) =>
+    Number(b.highest_checkout) -
+    Number(a.highest_checkout)
+  );
 
 
   if (players.length === 0) {
 
     document.getElementById("checkoutMessage")
-      .textContent =
-      "No checkouts entered yet.";
+    .textContent =
+    "No checkouts entered yet.";
 
     return;
-
   }
 
 
   const body =
-    document.getElementById("checkoutBody");
+  document.getElementById("checkoutBody");
 
   body.innerHTML = "";
 
@@ -380,48 +350,14 @@ function showCheckouts(data) {
   players.forEach((player, index) => {
 
     const row =
-      document.createElement("tr");
+    document.createElement("tr");
 
-
-    const pos =
-      document.createElement("td");
-
-    const name =
-      document.createElement("td");
-
-    const team =
-      document.createElement("td");
-
-    const checkout =
-      document.createElement("td");
-
-
-    pos.textContent =
-      index + 1;
-
-    pos.className =
-      "position";
-
-
-    name.textContent =
-      player.player_name;
-
-
-    team.textContent =
-      player.team;
-
-
-    checkout.textContent =
-      player.highest_checkout;
-
-    checkout.className =
-      "stat-number";
-
-
-    row.appendChild(pos);
-    row.appendChild(name);
-    row.appendChild(team);
-    row.appendChild(checkout);
+    row.innerHTML = `
+      <td class="position">${index + 1}</td>
+      <td>${player.player_name}</td>
+      <td>${player.team}</td>
+      <td class="stat-number">${player.highest_checkout}</td>
+    `;
 
     body.appendChild(row);
 
@@ -429,19 +365,72 @@ function showCheckouts(data) {
 
 
   document.getElementById("checkoutMessage")
-    .style.display =
-    "none";
+  .style.display = "none";
 
   document.getElementById("checkoutTable")
-    .style.display =
-    "table";
+  .style.display = "table";
 
 }
 
 
-// ===============================
+// MOST DOMINOES 3-0s
+
+function showDominoes(data) {
+
+  const players =
+  [...data]
+  .filter(player =>
+    Number(player.dominoes_3_0s) > 0
+  )
+  .sort((a, b) =>
+    Number(b.dominoes_3_0s) -
+    Number(a.dominoes_3_0s)
+  );
+
+
+  if (players.length === 0) {
+
+    document.getElementById("dominoesMessage")
+    .textContent =
+    "No dominoes 3–0s entered yet.";
+
+    return;
+  }
+
+
+  const body =
+  document.getElementById("dominoesBody");
+
+  body.innerHTML = "";
+
+
+  players.forEach((player, index) => {
+
+    const row =
+    document.createElement("tr");
+
+    row.innerHTML = `
+      <td class="position">${index + 1}</td>
+      <td>${player.player_name}</td>
+      <td>${player.team}</td>
+      <td class="stat-number">${player.dominoes_3_0s}</td>
+    `;
+
+    body.appendChild(row);
+
+  });
+
+
+  document.getElementById("dominoesMessage")
+  .style.display = "none";
+
+  document.getElementById("dominoesTable")
+  .style.display = "table";
+
+}
+
+
 // START
-// ===============================
 
 loadStats();
 
