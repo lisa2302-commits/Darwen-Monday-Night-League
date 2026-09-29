@@ -1,60 +1,196 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - Monday Nite League</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-body{font-family:Arial,sans-serif;background:#111827;color:white;margin:0}
-header{background:#0f172a;padding:20px;text-align:center;border-bottom:3px solid #facc15}
-header h1{color:#facc15;margin:0}
-nav{background:#1e293b;text-align:center;padding:12px}
-nav a{color:white;text-decoration:none;margin:8px;font-weight:bold}
-nav a:hover{color:#facc15}
-.container{max-width:800px;margin:auto;padding:15px}
-.card{background:#1e293b;padding:20px;border-radius:10px;margin-bottom:20px}
-h2{color:#facc15;text-align:center}
-label{display:block;margin-top:10px;font-weight:bold}
-input,select{width:100%;box-sizing:border-box;padding:12px;margin:7px 0;border-radius:6px;border:none;font-size:16px}
-button{width:100%;padding:12px;margin-top:10px;border:none;border-radius:6px;background:#facc15;color:#111827;font-weight:bold;font-size:16px;cursor:pointer}
-button:hover{opacity:.9}
-#adminPanel{display:none}
-.message{text-align:center;margin-top:12px;font-weight:bold}
-.fixture-name{background:#334155;padding:12px;border-radius:6px;text-align:center;margin:10px 0;line-height:1.5}
-.danger,.logout{background:#ef4444;color:white}
 
-/* =========================
-   MOBILE FRIENDLY
-   ========================= */
+<title>Admin - Monday Nite League</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background: #111827;
+  color: white;
+  margin: 0;
+}
+
+header {
+  background: #0f172a;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 3px solid #facc15;
+}
+
+header h1 {
+  color: #facc15;
+  margin: 0;
+}
+
 nav {
+  background: #1e293b;
+  text-align: center;
+  padding: 12px;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 8px;
 }
+
 nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
   background: #334155;
   padding: 9px 12px;
   border-radius: 6px;
-  margin: 0;
 }
+
+nav a:hover {
+  color: #facc15;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 15px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+h2 {
+  color: #facc15;
+  text-align: center;
+}
+
+h3 {
+  color: #facc15;
+  margin-top: 22px;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+input,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin: 7px 0;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #facc15;
+  color: #111827;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.secondary {
+  background: #94a3b8;
+  color: #111827;
+}
+
+.danger,
+.logout {
+  background: #ef4444;
+  color: white;
+}
+
+#adminPanel {
+  display: none;
+}
+
+.message {
+  text-align: center;
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+.info-box {
+  background: #334155;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid #475569;
+  margin: 22px 0;
+}
+
 @media (max-width: 600px) {
-  header { padding: 15px 8px; }
-  header h1 { font-size: 22px; }
-  nav { padding: 10px 5px; }
-  nav a { font-size: 14px; padding: 8px 9px; }
-  .container { padding: 10px; }
-  .card { padding: 10px; }
-  table { font-size: 13px; }
-  th, td { padding: 8px 5px; }
-  button, input, select { font-size: 16px; }
+
+  header {
+    padding: 15px 8px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+
+  nav {
+    padding: 10px 5px;
+  }
+
+  nav a {
+    font-size: 14px;
+    padding: 8px 9px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  button,
+  input,
+  select {
+    font-size: 16px;
+  }
 }
 
 </style>
+
 </head>
+
 <body>
-<header><h1>🔐 Monday Nite League Admin</h1></header>
+
+<header>
+<h1>🔐 Monday Nite League Admin</h1>
+</header>
+
 <nav>
 <a href="index.html">🏆 League</a>
 <a href="fixtures.html">📅 Fixtures</a>
@@ -64,414 +200,2170 @@ nav a {
 </nav>
 
 <div class="container">
-  <div class="card" id="loginCard">
-    <h2>🔐 Admin Login</h2>
-    <input id="email" type="email" placeholder="Admin email" autocomplete="username">
-    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
-    <button id="loginButton" type="button">Login</button>
-    <div id="loginMessage" class="message"></div>
-  </div>
 
-  <div id="adminPanel">
-    <div class="card">
-      <h2>📝 Enter Result</h2>
-      <label for="weekSelect">Week</label>
-      <select id="weekSelect"></select>
-      <label for="fixtureSelect">Fixture</label>
-      <select id="fixtureSelect"></select>
-      <div id="fixtureName" class="fixture-name"></div>
-      <label for="homeScore">Home Score</label>
-      <input id="homeScore" type="number" min="0" max="14" placeholder="Home score">
-      <label for="awayScore">Away Score</label>
-      <input id="awayScore" type="number" min="0" max="14" placeholder="Away score">
-      <button id="saveResultButton" type="button">✅ Save Result</button>
-      <div id="saveMessage" class="message"></div>
-    </div>
+<!-- LOGIN -->
 
+<div class="card" id="loginCard">
 
-    <div class="card">
-      <h2>📅 Current League Week</h2>
-      <label for="currentWeekSelect">Select Current Week</label>
-      <select id="currentWeekSelect"></select>
-      <button id="saveCurrentWeekButton" type="button">✅ Save Current Week</button>
-      <div id="currentWeekMessage" class="message"></div>
-    </div>
+<h2>🔐 Admin Login</h2>
 
-    <div class="card">
-      <h2>🛠 Manage Results</h2>
-      <button id="loadResultsButton" type="button">Load Saved Results</button>
-      <label for="savedResultSelect">Saved Result</label>
-      <select id="savedResultSelect"></select>
-      <div id="savedResultInfo" class="fixture-name">Choose a saved result.</div>
-      <label for="editHomeScore">Home Score</label>
-      <input id="editHomeScore" type="number" min="0" max="14">
-      <label for="editAwayScore">Away Score</label>
-      <input id="editAwayScore" type="number" min="0" max="14">
-      <button id="updateResultButton" type="button">✅ Update Result</button>
-      <button id="deleteResultButton" class="danger" type="button">🗑 Delete Result</button>
-      <div id="manageResultMessage" class="message"></div>
-    </div>
+<input
+  id="email"
+  type="email"
+  placeholder="Admin email"
+  autocomplete="username"
+>
 
-    <div class="card">
-      <h2>📊 Player Stats</h2>
-      <label for="playerName">Player Name</label>
-      <input id="playerName" type="text" placeholder="Player name">
-      <label for="playerTeam">Team</label>
-      <select id="playerTeam"></select>
-      <button id="loadPlayerButton" type="button">Load Player</button>
-      <div id="currentStats" class="fixture-name">Enter a player name and select their team.</div>
-      <button id="add180Button" type="button">🎯 +1 180</button>
-      <button id="add30Button" type="button">🁫 +1 Dominoes 3–0</button>
-      <label for="playerCheckout">New Highest Checkout</label>
-      <input id="playerCheckout" type="number" min="1" max="170" placeholder="e.g. 120">
-      <button id="saveCheckoutButton" type="button">🔥 Save Highest Checkout</button>
-      <div id="statsMessage" class="message"></div>
-    </div>
+<input
+  id="password"
+  type="password"
+  placeholder="Password"
+  autocomplete="current-password"
+>
 
-    <div class="card"><button id="logoutButton" class="logout" type="button">Log Out</button></div>
-  </div>
+<button id="loginButton" type="button">
+Login
+</button>
+
+<div id="loginMessage" class="message"></div>
+
 </div>
 
+
+<!-- ADMIN PANEL -->
+
+<div id="adminPanel">
+
+
+<!-- ENTER RESULT -->
+
+<div class="card">
+
+<h2>📝 Enter Result</h2>
+
+<label for="weekSelect">Week</label>
+<select id="weekSelect"></select>
+
+<label for="fixtureSelect">Fixture</label>
+<select id="fixtureSelect"></select>
+
+<div id="fixtureName" class="info-box"></div>
+
+<label for="homeScore">Home Score</label>
+<input id="homeScore" type="number" min="0" max="14" placeholder="Home score">
+
+<label for="awayScore">Away Score</label>
+<input id="awayScore" type="number" min="0" max="14" placeholder="Away score">
+
+<button id="saveResultButton" type="button">
+✅ Save Result
+</button>
+
+<div id="saveMessage" class="message"></div>
+
+</div>
+
+
+<!-- CURRENT WEEK -->
+
+<div class="card">
+
+<h2>📅 Current League Week</h2>
+
+<label for="currentWeekSelect">Select Current Week</label>
+<select id="currentWeekSelect"></select>
+
+<button id="saveCurrentWeekButton" type="button">
+✅ Save Current Week
+</button>
+
+<div id="currentWeekMessage" class="message"></div>
+
+</div>
+
+
+<!-- MANAGE RESULTS -->
+
+<div class="card">
+
+<h2>🛠 Manage Results</h2>
+
+<button id="loadResultsButton" type="button">
+Load Saved Results
+</button>
+
+<label for="savedResultSelect">Saved Result</label>
+<select id="savedResultSelect"></select>
+
+<div id="savedResultInfo" class="info-box">
+Choose a saved result.
+</div>
+
+<label for="editHomeScore">Home Score</label>
+<input id="editHomeScore" type="number" min="0" max="14">
+
+<label for="editAwayScore">Away Score</label>
+<input id="editAwayScore" type="number" min="0" max="14">
+
+<button id="updateResultButton" type="button">
+✅ Update Result
+</button>
+
+<button id="deleteResultButton" class="danger" type="button">
+🗑 Delete Result
+</button>
+
+<div id="manageResultMessage" class="message"></div>
+
+</div>
+
+
+<!-- PLAYER STATS -->
+
+<div class="card">
+
+<h2>📊 Player Stats</h2>
+
+<h3>👤 Saved Player</h3>
+
+<label for="savedPlayerSelect">Choose Player</label>
+<select id="savedPlayerSelect">
+  <option value="">Select a saved player...</option>
+</select>
+
+<button id="refreshPlayersButton" class="secondary" type="button">
+↻ Refresh Player List
+</button>
+
+<div id="currentStats" class="info-box">
+Choose a saved player.
+</div>
+
+<button id="add180Button" type="button">
+🎯 +1 180
+</button>
+
+<button id="add30Button" type="button">
+🁫 +1 Dominoes 3–0
+</button>
+
+<label for="playerCheckout">New Highest Checkout</label>
+<input
+  id="playerCheckout"
+  type="number"
+  min="1"
+  max="170"
+  placeholder="e.g. 120"
+>
+
+<button id="saveCheckoutButton" type="button">
+🔥 Save Highest Checkout
+</button>
+
+<hr class="divider">
+
+<h3>✏️ Correct Player Stats</h3>
+
+<label for="edit180s">180s</label>
+<input id="edit180s" type="number" min="0" value="0">
+
+<label for="editCheckout">Highest Checkout</label>
+<input id="editCheckout" type="number" min="0" max="170" value="0">
+
+<label for="edit30s">Dominoes 3–0s</label>
+<input id="edit30s" type="number" min="0" value="0">
+
+<button id="saveExactStatsButton" type="button">
+✅ Save Corrected Stats
+</button>
+
+<button id="deletePlayerButton" class="danger" type="button">
+🗑 Delete Selected Player
+</button>
+
+<hr class="divider">
+
+<h3>➕ Add New Player</h3>
+
+<label for="newPlayerName">Player Name</label>
+<input
+  id="newPlayerName"
+  type="text"
+  placeholder="Player name"
+>
+
+<label for="newPlayerTeam">Team</label>
+<select id="newPlayerTeam"></select>
+
+<button id="addPlayerButton" type="button">
+➕ Add Player
+</button>
+
+<div id="statsMessage" class="message"></div>
+
+</div>
+
+
+<!-- LOGOUT -->
+
+<div class="card">
+
+<button id="logoutButton" class="logout" type="button">
+Log Out
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
 <script>
-const SUPABASE_URL = "https://zczdgjwmewgbkgxoqplm.supabase.co";
-const SUPABASE_KEY = "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================
+// SUPABASE
+// ============================
+
+const SUPABASE_URL =
+  "https://zczdgjwmewgbkgxoqplm.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+// ============================
+// TEAMS
+// ============================
 
 const teams = [
-  "Crown A","Punch","ICI","Golden Cup","The Park Inn","Bird in Hand",
-  "Victoria A","Two Gates Club","Funky Room","Entwistle","Crown B","Victoria B"
+  "Crown A",
+  "Punch",
+  "ICI",
+  "Golden Cup",
+  "The Park Inn",
+  "Bird in Hand",
+  "Victoria A",
+  "Two Gates Club",
+  "Funky Room",
+  "Entwistle",
+  "Crown B",
+  "Victoria B"
 ];
 
+
 let fixtures = [];
+
 let savedResults = [];
 
-function el(id){ return document.getElementById(id); }
+let savedPlayers = [];
 
-async function login(){
-  const email = el("email").value.trim();
-  const password = el("password").value;
-  const message = el("loginMessage");
-  if(!email || !password){ message.textContent = "Enter your email and password."; return; }
-  message.textContent = "Logging in...";
-  const { error } = await db.auth.signInWithPassword({ email, password });
-  if(error){ message.textContent = "Login failed: " + error.message; return; }
+
+// ============================
+// HELPER
+// ============================
+
+function el(id) {
+  return document.getElementById(id);
+}
+
+
+// ============================
+// LOGIN
+// ============================
+
+async function login() {
+
+  const email =
+    el("email").value.trim();
+
+  const password =
+    el("password").value;
+
+  const message =
+    el("loginMessage");
+
+
+  if (!email || !password) {
+
+    message.textContent =
+      "Enter your email and password.";
+
+    return;
+  }
+
+
+  message.textContent =
+    "Logging in...";
+
+
+  const { error } =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+
+  if (error) {
+
+    message.textContent =
+      "Login failed: " +
+      error.message;
+
+    return;
+  }
+
+
   message.textContent = "";
-  showAdmin();
+
+  await showAdmin();
+
 }
 
-function showAdmin(){
-  el("loginCard").style.display = "none";
-  el("adminPanel").style.display = "block";
-  loadSavedResults();
+
+// ============================
+// SHOW ADMIN
+// ============================
+
+async function showAdmin() {
+
+  el("loginCard").style.display =
+    "none";
+
+  el("adminPanel").style.display =
+    "block";
+
+
+  await Promise.all([
+    loadSavedResults(),
+    loadPlayers(),
+    loadCurrentWeek()
+  ]);
+
 }
 
-async function logout(){
+
+// ============================
+// LOGOUT
+// ============================
+
+async function logout() {
+
   await db.auth.signOut();
-  el("adminPanel").style.display = "none";
-  el("loginCard").style.display = "block";
+
+  el("adminPanel").style.display =
+    "none";
+
+  el("loginCard").style.display =
+    "block";
+
   el("password").value = "";
+
   el("loginMessage").textContent = "";
+
 }
 
-async function checkSession(){
-  const { data: { session } } = await db.auth.getSession();
-  if(session) showAdmin();
+
+// ============================
+// CHECK SESSION
+// ============================
+
+async function checkSession() {
+
+  const {
+    data: { session }
+  } =
+    await db.auth.getSession();
+
+
+  if (session) {
+
+    await showAdmin();
+
+  }
+
 }
 
-function isHome(matches, team){
-  const match = matches.find(m => m.home === team || m.away === team);
-  return match ? match.home === team : false;
-}
 
-function orientRound(pairs, roundNumber){
-  const defaults = pairs.map((pair,index) =>
-    ((index + roundNumber) % 2 === 0)
-      ? { home: pair[0], away: pair[1] }
-      : { home: pair[1], away: pair[0] }
-  );
-  let best = defaults;
-  let bestFlips = 999;
-  for(let mask=0; mask<64; mask++){
-    const matches = defaults.map((match,index) =>
-      (mask & (1 << index))
-        ? { home: match.away, away: match.home }
-        : { home: match.home, away: match.away }
+// ============================
+// FIXTURE HELPERS
+// ============================
+
+function isHome(matches, team) {
+
+  const match =
+    matches.find(
+      m =>
+        m.home === team ||
+        m.away === team
     );
-    const crownsOK = isHome(matches,"Crown A") !== isHome(matches,"Crown B");
-    const victoriasOK = isHome(matches,"Victoria A") !== isHome(matches,"Victoria B");
-    if(crownsOK && victoriasOK){
+
+
+  return match
+    ? match.home === team
+    : false;
+
+}
+
+
+function orientRound(
+  pairs,
+  roundNumber
+) {
+
+  const defaults =
+    pairs.map(
+      (pair, index) => {
+
+        if (
+          (index + roundNumber)
+          % 2 === 0
+        ) {
+
+          return {
+            home: pair[0],
+            away: pair[1]
+          };
+
+        }
+
+
+        return {
+          home: pair[1],
+          away: pair[0]
+        };
+
+      }
+    );
+
+
+  let best =
+    defaults;
+
+  let bestFlips =
+    999;
+
+
+  for (
+    let mask = 0;
+    mask < 64;
+    mask++
+  ) {
+
+    const matches =
+      defaults.map(
+        (match, index) => {
+
+          if (
+            mask &
+            (1 << index)
+          ) {
+
+            return {
+              home: match.away,
+              away: match.home
+            };
+
+          }
+
+
+          return {
+            home: match.home,
+            away: match.away
+          };
+
+        }
+      );
+
+
+    const crownsOK =
+      isHome(
+        matches,
+        "Crown A"
+      )
+      !==
+      isHome(
+        matches,
+        "Crown B"
+      );
+
+
+    const victoriasOK =
+      isHome(
+        matches,
+        "Victoria A"
+      )
+      !==
+      isHome(
+        matches,
+        "Victoria B"
+      );
+
+
+    if (
+      crownsOK &&
+      victoriasOK
+    ) {
+
       let flips = 0;
-      for(let i=0;i<6;i++) if(mask & (1 << i)) flips++;
-      if(flips < bestFlips){ best = matches; bestFlips = flips; }
+
+
+      for (
+        let i = 0;
+        i < 6;
+        i++
+      ) {
+
+        if (
+          mask &
+          (1 << i)
+        ) {
+
+          flips++;
+
+        }
+
+      }
+
+
+      if (
+        flips <
+        bestFlips
+      ) {
+
+        best =
+          matches;
+
+        bestFlips =
+          flips;
+
+      }
+
     }
+
   }
+
+
   return best;
+
 }
 
-function generateFirstHalf(){
-  const fixedTeam = teams[0];
-  let rotating = teams.slice(1);
+
+// ============================
+// GENERATE FIXTURES
+// ============================
+
+function generateFirstHalf() {
+
+  const fixedTeam =
+    teams[0];
+
+  let rotating =
+    teams.slice(1);
+
   const rounds = [];
-  for(let round=0; round<11; round++){
-    const current = [fixedTeam, ...rotating];
+
+
+  for (
+    let round = 0;
+    round < 11;
+    round++
+  ) {
+
+    const current = [
+      fixedTeam,
+      ...rotating
+    ];
+
     const pairs = [];
-    for(let i=0; i<6; i++) pairs.push([current[i], current[11-i]]);
-    rounds.push(orientRound(pairs, round));
-    rotating.unshift(rotating.pop());
+
+
+    for (
+      let i = 0;
+      i < 6;
+      i++
+    ) {
+
+      pairs.push([
+        current[i],
+        current[11 - i]
+      ]);
+
+    }
+
+
+    rounds.push(
+      orientRound(
+        pairs,
+        round
+      )
+    );
+
+
+    rotating.unshift(
+      rotating.pop()
+    );
+
   }
+
+
   return rounds;
-}
 
-function generateFixtures(){
-  const firstHalf = generateFirstHalf();
-  const secondHalf = firstHalf.map(round => round.map(m => ({ home:m.away, away:m.home })));
-  fixtures = [...firstHalf, ...secondHalf];
-}
-
-function loadWeeks(){
-  el("weekSelect").innerHTML = "";
-  for(let week=1; week<=22; week++){
-    const option = document.createElement("option");
-    option.value = week-1;
-    option.textContent = "Week " + week;
-    el("weekSelect").appendChild(option);
-  }
-  loadFixtures();
-}
-
-function loadFixtures(){
-  const weekIndex = Number(el("weekSelect").value || 0);
-  el("fixtureSelect").innerHTML = "";
-  fixtures[weekIndex].forEach((match,index) => {
-    const option = document.createElement("option");
-    option.value = index;
-    option.textContent = match.home + " v " + match.away;
-    el("fixtureSelect").appendChild(option);
-  });
-  showFixture();
-}
-
-function showFixture(){
-  const weekIndex = Number(el("weekSelect").value || 0);
-  const fixtureIndex = Number(el("fixtureSelect").value || 0);
-  const match = fixtures[weekIndex][fixtureIndex];
-  el("fixtureName").textContent = match ? (match.home + " v " + match.away) : "";
-}
-
-async function saveResult(){
-  const homeValue = el("homeScore").value;
-  const awayValue = el("awayScore").value;
-  if(homeValue === "" || awayValue === ""){ el("saveMessage").textContent = "Enter both scores."; return; }
-  const weekIndex = Number(el("weekSelect").value);
-  const fixtureIndex = Number(el("fixtureSelect").value);
-  const match = fixtures[weekIndex][fixtureIndex];
-  const weekNumber = weekIndex + 1;
-  const homeScore = Number(homeValue);
-  const awayScore = Number(awayValue);
-  el("saveMessage").textContent = "Saving...";
-  const { data:existing, error:checkError } = await db.from("results").select("id")
-    .eq("week",weekNumber).eq("home_team",match.home).eq("away_team",match.away).maybeSingle();
-  if(checkError){ el("saveMessage").textContent = "Error: " + checkError.message; return; }
-  let error;
-  if(existing){
-    ({ error } = await db.from("results").update({ home_score:homeScore, away_score:awayScore }).eq("id",existing.id));
-  }else{
-    ({ error } = await db.from("results").insert({ week:weekNumber, home_team:match.home, away_team:match.away, home_score:homeScore, away_score:awayScore }));
-  }
-  if(error){ el("saveMessage").textContent = "Error: " + error.message; return; }
-  el("saveMessage").textContent = "✅ Result saved";
-  el("homeScore").value = "";
-  el("awayScore").value = "";
-  await loadSavedResults();
-}
-
-async function loadSavedResults(){
-  el("manageResultMessage").textContent = "Loading...";
-  const { data, error } = await db.from("results").select("*").order("week",{ascending:true}).order("id",{ascending:true});
-  if(error){ el("manageResultMessage").textContent = "Error: " + error.message; return; }
-  savedResults = data || [];
-  el("savedResultSelect").innerHTML = "";
-  if(!savedResults.length){
-    el("manageResultMessage").textContent = "No results saved yet.";
-    el("savedResultInfo").textContent = "No saved results.";
-    el("editHomeScore").value = "";
-    el("editAwayScore").value = "";
-    return;
-  }
-  savedResults.forEach(result => {
-    const option = document.createElement("option");
-    option.value = result.id;
-    option.textContent = `Week ${result.week} - ${result.home_team} ${result.home_score} - ${result.away_score} ${result.away_team}`;
-    el("savedResultSelect").appendChild(option);
-  });
-  el("manageResultMessage").textContent = "";
-  showSavedResult();
-}
-
-function showSavedResult(){
-  const id = Number(el("savedResultSelect").value);
-  const result = savedResults.find(r => Number(r.id) === id);
-  if(!result) return;
-  el("savedResultInfo").textContent = `Week ${result.week}: ${result.home_team} v ${result.away_team}`;
-  el("editHomeScore").value = result.home_score;
-  el("editAwayScore").value = result.away_score;
-}
-
-async function updateSavedResult(){
-  const id = Number(el("savedResultSelect").value);
-  if(!id) return;
-  const homeValue = el("editHomeScore").value;
-  const awayValue = el("editAwayScore").value;
-  if(homeValue === "" || awayValue === ""){ el("manageResultMessage").textContent = "Enter both scores."; return; }
-  const { error } = await db.from("results").update({ home_score:Number(homeValue), away_score:Number(awayValue) }).eq("id",id);
-  if(error){ el("manageResultMessage").textContent = "Error: " + error.message; return; }
-  await loadSavedResults();
-  el("manageResultMessage").textContent = "✅ Result updated";
-}
-
-async function deleteSavedResult(){
-  const id = Number(el("savedResultSelect").value);
-  const result = savedResults.find(r => Number(r.id) === id);
-  if(!result) return;
-  if(!confirm(`Delete ${result.home_team} ${result.home_score} - ${result.away_score} ${result.away_team}?`)) return;
-  const { error } = await db.from("results").delete().eq("id",id);
-  if(error){ el("manageResultMessage").textContent = "Error: " + error.message; return; }
-  await loadSavedResults();
-  el("manageResultMessage").textContent = "✅ Result deleted";
-}
-
-function loadPlayerTeams(){
-  el("playerTeam").innerHTML = "";
-  teams.forEach(team => {
-    const option = document.createElement("option");
-    option.value = team;
-    option.textContent = team;
-    el("playerTeam").appendChild(option);
-  });
-}
-
-async function getPlayer(){
-  const playerName = el("playerName").value.trim();
-  const team = el("playerTeam").value;
-  if(!playerName) return null;
-  const { data, error } = await db.from("player_stats").select("*").eq("player_name",playerName).eq("team",team).maybeSingle();
-  if(error) throw error;
-  return data;
-}
-
-async function createPlayerIfNeeded(){
-  let player = await getPlayer();
-  if(player) return player;
-  const playerName = el("playerName").value.trim();
-  const team = el("playerTeam").value;
-  if(!playerName) throw new Error("Enter the player's name.");
-  const { data, error } = await db.from("player_stats").insert({ player_name:playerName, team, total_180s:0, highest_checkout:0, dominoes_3_0s:0 }).select().single();
-  if(error) throw error;
-  return data;
-}
-
-async function loadPlayerStats(){
-  try{
-    const player = await getPlayer();
-    if(!player){ el("currentStats").textContent = "New player — no stats entered yet."; el("statsMessage").textContent = ""; return; }
-    el("currentStats").innerHTML = `🎯 180s: <strong>${player.total_180s}</strong><br><br>🔥 Highest Checkout: <strong>${player.highest_checkout}</strong><br><br>🁫 Dominoes 3–0s: <strong>${player.dominoes_3_0s}</strong>`;
-    el("statsMessage").textContent = "";
-  }catch(error){ el("statsMessage").textContent = "Error: " + error.message; }
-}
-
-async function addStat(field){
-  try{
-    const player = await createPlayerIfNeeded();
-    const newTotal = Number(player[field] || 0) + 1;
-    const updateData = { [field]: newTotal };
-    const { error } = await db.from("player_stats").update(updateData).eq("id",player.id);
-    if(error) throw error;
-    el("statsMessage").textContent = field === "total_180s" ? "✅ 180 added" : "✅ Dominoes 3–0 added";
-    await loadPlayerStats();
-  }catch(error){ el("statsMessage").textContent = "Error: " + error.message; }
-}
-
-async function saveHighestCheckout(){
-  const checkout = Number(el("playerCheckout").value);
-  if(!checkout || checkout < 1 || checkout > 170){ el("statsMessage").textContent = "Enter a checkout between 1 and 170."; return; }
-  try{
-    const player = await createPlayerIfNeeded();
-    const current = Number(player.highest_checkout || 0);
-    if(checkout <= current){ el("statsMessage").textContent = `Current highest checkout is ${current}. Nothing changed.`; return; }
-    const { error } = await db.from("player_stats").update({ highest_checkout:checkout }).eq("id",player.id);
-    if(error) throw error;
-    el("playerCheckout").value = "";
-    el("statsMessage").textContent = "✅ New highest checkout saved";
-    await loadPlayerStats();
-  }catch(error){ el("statsMessage").textContent = "Error: " + error.message; }
 }
 
 
-async function loadCurrentWeek(){
-  const select = el("currentWeekSelect");
+function generateFixtures() {
+
+  const firstHalf =
+    generateFirstHalf();
+
+
+  const secondHalf =
+    firstHalf.map(
+      round =>
+        round.map(
+          match => ({
+            home: match.away,
+            away: match.home
+          })
+        )
+    );
+
+
+  fixtures = [
+    ...firstHalf,
+    ...secondHalf
+  ];
+
+}
+
+
+// ============================
+// LOAD WEEKS
+// ============================
+
+function loadWeeks() {
+
+  const select =
+    el("weekSelect");
+
   select.innerHTML = "";
-  for(let week=1; week<=22; week++){
-    const option = document.createElement("option");
-    option.value = week;
-    option.textContent = "Week " + week;
-    select.appendChild(option);
+
+
+  for (
+    let week = 1;
+    week <= 22;
+    week++
+  ) {
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value =
+      week - 1;
+
+    option.textContent =
+      "Week " + week;
+
+    select.appendChild(
+      option
+    );
+
   }
 
-  const { data, error } = await db.from("league_settings")
-    .select("current_week")
-    .eq("id",1)
-    .single();
 
-  if(error){
-    el("currentWeekMessage").textContent = "Unable to load current week: " + error.message;
-    return;
-  }
+  loadFixtures();
 
-  select.value = String(data.current_week);
-  el("currentWeekMessage").textContent = "Current week is Week " + data.current_week;
 }
 
-async function saveCurrentWeek(){
-  const week = Number(el("currentWeekSelect").value);
-  const message = el("currentWeekMessage");
-  if(!week){
-    message.textContent = "Choose a week first.";
-    return;
-  }
-  message.textContent = "Saving...";
-  const { error } = await db.from("league_settings")
-    .update({ current_week: week })
-    .eq("id",1);
-  if(error){
-    message.textContent = "Error: " + error.message;
-    return;
-  }
-  message.textContent = "✅ Current week set to Week " + week;
+
+// ============================
+// LOAD FIXTURES
+// ============================
+
+function loadFixtures() {
+
+  const weekIndex =
+    Number(
+      el("weekSelect").value ||
+      0
+    );
+
+
+  const select =
+    el("fixtureSelect");
+
+  select.innerHTML = "";
+
+
+  fixtures[weekIndex]
+  .forEach(
+    (match, index) => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        index;
+
+      option.textContent =
+        match.home +
+        " v " +
+        match.away;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  showFixture();
+
 }
 
-el("loginButton").addEventListener("click", login);
-el("logoutButton").addEventListener("click", logout);
-el("weekSelect").addEventListener("change", loadFixtures);
-el("fixtureSelect").addEventListener("change", showFixture);
-el("saveResultButton").addEventListener("click", saveResult);
-el("loadResultsButton").addEventListener("click", loadSavedResults);
-el("saveCurrentWeekButton").addEventListener("click", saveCurrentWeek);
-el("savedResultSelect").addEventListener("change", showSavedResult);
-el("updateResultButton").addEventListener("click", updateSavedResult);
-el("deleteResultButton").addEventListener("click", deleteSavedResult);
-el("loadPlayerButton").addEventListener("click", loadPlayerStats);
-el("add180Button").addEventListener("click", () => addStat("total_180s"));
-el("add30Button").addEventListener("click", () => addStat("dominoes_3_0s"));
-el("saveCheckoutButton").addEventListener("click", saveHighestCheckout);
 
-// Allow Enter key on password box to log in.
-el("password").addEventListener("keydown", event => { if(event.key === "Enter") login(); });
+// ============================
+// SHOW FIXTURE
+// ============================
+
+function showFixture() {
+
+  const weekIndex =
+    Number(
+      el("weekSelect").value ||
+      0
+    );
+
+  const fixtureIndex =
+    Number(
+      el("fixtureSelect").value ||
+      0
+    );
+
+
+  const match =
+    fixtures[weekIndex][fixtureIndex];
+
+
+  el("fixtureName").textContent =
+    match
+      ? match.home +
+        " v " +
+        match.away
+      : "";
+
+}
+
+
+// ============================
+// SAVE RESULT
+// ============================
+
+async function saveResult() {
+
+  const homeValue =
+    el("homeScore").value;
+
+  const awayValue =
+    el("awayScore").value;
+
+
+  if (
+    homeValue === "" ||
+    awayValue === ""
+  ) {
+
+    el("saveMessage").textContent =
+      "Enter both scores.";
+
+    return;
+
+  }
+
+
+  const weekIndex =
+    Number(
+      el("weekSelect").value
+    );
+
+  const fixtureIndex =
+    Number(
+      el("fixtureSelect").value
+    );
+
+  const match =
+    fixtures[
+      weekIndex
+    ][
+      fixtureIndex
+    ];
+
+  const weekNumber =
+    weekIndex + 1;
+
+  const homeScore =
+    Number(homeValue);
+
+  const awayScore =
+    Number(awayValue);
+
+
+  el("saveMessage").textContent =
+    "Saving...";
+
+
+  const {
+    data: existing,
+    error: checkError
+  } =
+    await db
+      .from("results")
+      .select("id")
+      .eq(
+        "week",
+        weekNumber
+      )
+      .eq(
+        "home_team",
+        match.home
+      )
+      .eq(
+        "away_team",
+        match.away
+      )
+      .maybeSingle();
+
+
+  if (checkError) {
+
+    el("saveMessage").textContent =
+      "Error: " +
+      checkError.message;
+
+    return;
+
+  }
+
+
+  let error;
+
+
+  if (existing) {
+
+    ({
+      error
+    } =
+      await db
+        .from("results")
+        .update({
+          home_score:
+            homeScore,
+          away_score:
+            awayScore
+        })
+        .eq(
+          "id",
+          existing.id
+        )
+    );
+
+  }
+
+  else {
+
+    ({
+      error
+    } =
+      await db
+        .from("results")
+        .insert({
+          week:
+            weekNumber,
+          home_team:
+            match.home,
+          away_team:
+            match.away,
+          home_score:
+            homeScore,
+          away_score:
+            awayScore
+        })
+    );
+
+  }
+
+
+  if (error) {
+
+    el("saveMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  el("saveMessage").textContent =
+    "✅ Result saved";
+
+  el("homeScore").value = "";
+
+  el("awayScore").value = "";
+
+
+  await loadSavedResults();
+
+}
+
+
+// ============================
+// MANAGE RESULTS
+// ============================
+
+async function loadSavedResults() {
+
+  el("manageResultMessage").textContent =
+    "Loading...";
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("results")
+      .select("*")
+      .order(
+        "week",
+        { ascending: true }
+      )
+      .order(
+        "id",
+        { ascending: true }
+      );
+
+
+  if (error) {
+
+    el("manageResultMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  savedResults =
+    data || [];
+
+
+  el("savedResultSelect").innerHTML =
+    "";
+
+
+  if (
+    !savedResults.length
+  ) {
+
+    el("manageResultMessage").textContent =
+      "No results saved yet.";
+
+    el("savedResultInfo").textContent =
+      "No saved results.";
+
+    el("editHomeScore").value = "";
+
+    el("editAwayScore").value = "";
+
+    return;
+
+  }
+
+
+  savedResults.forEach(
+    result => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        result.id;
+
+      option.textContent =
+        `Week ${result.week} - ${result.home_team} ${result.home_score} - ${result.away_score} ${result.away_team}`;
+
+      el("savedResultSelect")
+      .appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  el("manageResultMessage").textContent =
+    "";
+
+  showSavedResult();
+
+}
+
+
+function showSavedResult() {
+
+  const id =
+    Number(
+      el("savedResultSelect")
+      .value
+    );
+
+
+  const result =
+    savedResults.find(
+      item =>
+        Number(item.id)
+        === id
+    );
+
+
+  if (!result) {
+    return;
+  }
+
+
+  el("savedResultInfo").textContent =
+    `Week ${result.week}: ${result.home_team} v ${result.away_team}`;
+
+  el("editHomeScore").value =
+    result.home_score;
+
+  el("editAwayScore").value =
+    result.away_score;
+
+}
+
+
+async function updateSavedResult() {
+
+  const id =
+    Number(
+      el("savedResultSelect")
+      .value
+    );
+
+
+  if (!id) {
+    return;
+  }
+
+
+  const homeValue =
+    el("editHomeScore").value;
+
+  const awayValue =
+    el("editAwayScore").value;
+
+
+  if (
+    homeValue === "" ||
+    awayValue === ""
+  ) {
+
+    el("manageResultMessage").textContent =
+      "Enter both scores.";
+
+    return;
+
+  }
+
+
+  const { error } =
+    await db
+      .from("results")
+      .update({
+        home_score:
+          Number(homeValue),
+        away_score:
+          Number(awayValue)
+      })
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    el("manageResultMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  await loadSavedResults();
+
+  el("manageResultMessage").textContent =
+    "✅ Result updated";
+
+}
+
+
+async function deleteSavedResult() {
+
+  const id =
+    Number(
+      el("savedResultSelect")
+      .value
+    );
+
+
+  const result =
+    savedResults.find(
+      item =>
+        Number(item.id)
+        === id
+    );
+
+
+  if (!result) {
+    return;
+  }
+
+
+  const sure =
+    confirm(
+      `Delete ${result.home_team} ${result.home_score} - ${result.away_score} ${result.away_team}?`
+    );
+
+
+  if (!sure) {
+    return;
+  }
+
+
+  const { error } =
+    await db
+      .from("results")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if (error) {
+
+    el("manageResultMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  await loadSavedResults();
+
+  el("manageResultMessage").textContent =
+    "✅ Result deleted";
+
+}
+
+
+// ============================
+// CURRENT WEEK
+// ============================
+
+function buildCurrentWeekList() {
+
+  const select =
+    el("currentWeekSelect");
+
+  select.innerHTML = "";
+
+
+  for (
+    let week = 1;
+    week <= 22;
+    week++
+  ) {
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value =
+      week;
+
+    option.textContent =
+      "Week " + week;
+
+    select.appendChild(
+      option
+    );
+
+  }
+
+}
+
+
+async function loadCurrentWeek() {
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("league_settings")
+      .select("current_week")
+      .eq(
+        "id",
+        1
+      )
+      .single();
+
+
+  if (error) {
+
+    el("currentWeekMessage").textContent =
+      "Unable to load current week: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  el("currentWeekSelect").value =
+    String(
+      data.current_week
+    );
+
+
+  el("currentWeekMessage").textContent =
+    "Current week is Week " +
+    data.current_week;
+
+}
+
+
+async function saveCurrentWeek() {
+
+  const week =
+    Number(
+      el("currentWeekSelect")
+      .value
+    );
+
+
+  if (!week) {
+
+    el("currentWeekMessage").textContent =
+      "Choose a week first.";
+
+    return;
+
+  }
+
+
+  el("currentWeekMessage").textContent =
+    "Saving...";
+
+
+  const { error } =
+    await db
+      .from("league_settings")
+      .update({
+        current_week:
+          week
+      })
+      .eq(
+        "id",
+        1
+      );
+
+
+  if (error) {
+
+    el("currentWeekMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  el("currentWeekMessage").textContent =
+    "✅ Current week set to Week " +
+    week;
+
+}
+
+
+// ============================
+// PLAYER TEAM LISTS
+// ============================
+
+function loadPlayerTeams() {
+
+  const newTeamSelect =
+    el("newPlayerTeam");
+
+
+  newTeamSelect.innerHTML =
+    "";
+
+
+  teams.forEach(
+    team => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        team;
+
+      option.textContent =
+        team;
+
+      newTeamSelect.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+
+
+// ============================
+// LOAD SAVED PLAYERS
+// ============================
+
+async function loadPlayers(
+  selectedId = null
+) {
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("player_stats")
+      .select("*")
+      .order(
+        "team",
+        { ascending: true }
+      )
+      .order(
+        "player_name",
+        { ascending: true }
+      );
+
+
+  if (error) {
+
+    el("statsMessage").textContent =
+      "Error loading players: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  savedPlayers =
+    data || [];
+
+
+  const select =
+    el("savedPlayerSelect");
+
+
+  select.innerHTML =
+    '<option value="">Select a saved player...</option>';
+
+
+  savedPlayers.forEach(
+    player => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        player.id;
+
+      option.textContent =
+        player.player_name +
+        " - " +
+        player.team;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  if (selectedId) {
+
+    select.value =
+      String(selectedId);
+
+  }
+
+
+  showSelectedPlayer();
+
+}
+
+
+// ============================
+// GET SELECTED PLAYER
+// ============================
+
+function getSelectedPlayer() {
+
+  const id =
+    Number(
+      el("savedPlayerSelect")
+      .value
+    );
+
+
+  if (!id) {
+    return null;
+  }
+
+
+  return (
+    savedPlayers.find(
+      player =>
+        Number(player.id)
+        === id
+    ) ||
+    null
+  );
+
+}
+
+
+// ============================
+// SHOW SELECTED PLAYER
+// ============================
+
+function showSelectedPlayer() {
+
+  const player =
+    getSelectedPlayer();
+
+
+  if (!player) {
+
+    el("currentStats").textContent =
+      "Choose a saved player.";
+
+    el("edit180s").value =
+      0;
+
+    el("editCheckout").value =
+      0;
+
+    el("edit30s").value =
+      0;
+
+    el("playerCheckout").value =
+      "";
+
+    return;
+
+  }
+
+
+  el("currentStats").innerHTML =
+    `<strong>${player.player_name}</strong><br>` +
+    `${player.team}<br><br>` +
+    `🎯 180s: <strong>${player.total_180s}</strong><br><br>` +
+    `🔥 Highest Checkout: <strong>${player.highest_checkout}</strong><br><br>` +
+    `🁫 Dominoes 3–0s: <strong>${player.dominoes_3_0s}</strong>`;
+
+
+  el("edit180s").value =
+    Number(
+      player.total_180s ||
+      0
+    );
+
+
+  el("editCheckout").value =
+    Number(
+      player.highest_checkout ||
+      0
+    );
+
+
+  el("edit30s").value =
+    Number(
+      player.dominoes_3_0s ||
+      0
+    );
+
+
+  el("playerCheckout").value =
+    "";
+
+}
+
+
+// ============================
+// ADD NEW PLAYER
+// ============================
+
+async function addNewPlayer() {
+
+  const name =
+    el("newPlayerName")
+    .value
+    .trim();
+
+  const team =
+    el("newPlayerTeam")
+    .value;
+
+
+  if (!name) {
+
+    el("statsMessage").textContent =
+      "Enter the player's name.";
+
+    return;
+
+  }
+
+
+  el("statsMessage").textContent =
+    "Checking player...";
+
+
+  const {
+    data: duplicates,
+    error: checkError
+  } =
+    await db
+      .from("player_stats")
+      .select("id, player_name, team")
+      .ilike(
+        "player_name",
+        name
+      )
+      .eq(
+        "team",
+        team
+      )
+      .limit(1);
+
+
+  if (checkError) {
+
+    el("statsMessage").textContent =
+      "Error: " +
+      checkError.message;
+
+    return;
+
+  }
+
+
+  if (
+    duplicates &&
+    duplicates.length > 0
+  ) {
+
+    el("statsMessage").textContent =
+      "That player is already saved for " +
+      team +
+      ".";
+
+    await loadPlayers(
+      duplicates[0].id
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("player_stats")
+      .insert({
+        player_name:
+          name,
+        team:
+          team,
+        total_180s:
+          0,
+        highest_checkout:
+          0,
+        dominoes_3_0s:
+          0
+      })
+      .select()
+      .single();
+
+
+  if (error) {
+
+    el("statsMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  el("newPlayerName").value =
+    "";
+
+
+  await loadPlayers(
+    data.id
+  );
+
+
+  el("statsMessage").textContent =
+    "✅ Player added";
+
+}
+
+
+// ============================
+// ADD +1 PLAYER STAT
+// ============================
+
+async function addStat(field) {
+
+  const player =
+    getSelectedPlayer();
+
+
+  if (!player) {
+
+    el("statsMessage").textContent =
+      "Choose a saved player first.";
+
+    return;
+
+  }
+
+
+  const newTotal =
+    Number(
+      player[field] ||
+      0
+    ) + 1;
+
+
+  const updateData = {};
+
+  updateData[field] =
+    newTotal;
+
+
+  const { error } =
+    await db
+      .from("player_stats")
+      .update(
+        updateData
+      )
+      .eq(
+        "id",
+        player.id
+      );
+
+
+  if (error) {
+
+    el("statsMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  await loadPlayers(
+    player.id
+  );
+
+
+  el("statsMessage").textContent =
+    field === "total_180s"
+      ? "✅ 180 added"
+      : "✅ Dominoes 3–0 added";
+
+}
+
+
+// ============================
+// SAVE HIGHEST CHECKOUT
+// ============================
+
+async function saveHighestCheckout() {
+
+  const player =
+    getSelectedPlayer();
+
+
+  if (!player) {
+
+    el("statsMessage").textContent =
+      "Choose a saved player first.";
+
+    return;
+
+  }
+
+
+  const checkout =
+    Number(
+      el("playerCheckout")
+      .value
+    );
+
+
+  if (
+    !checkout ||
+    checkout < 1 ||
+    checkout > 170
+  ) {
+
+    el("statsMessage").textContent =
+      "Enter a checkout between 1 and 170.";
+
+    return;
+
+  }
+
+
+  const current =
+    Number(
+      player.highest_checkout ||
+      0
+    );
+
+
+  if (
+    checkout <= current
+  ) {
+
+    el("statsMessage").textContent =
+      "Current highest checkout is " +
+      current +
+      ". Nothing changed.";
+
+    return;
+
+  }
+
+
+  const { error } =
+    await db
+      .from("player_stats")
+      .update({
+        highest_checkout:
+          checkout
+      })
+      .eq(
+        "id",
+        player.id
+      );
+
+
+  if (error) {
+
+    el("statsMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  await loadPlayers(
+    player.id
+  );
+
+
+  el("statsMessage").textContent =
+    "✅ New highest checkout saved";
+
+}
+
+
+// ============================
+// SAVE CORRECTED STATS
+// ============================
+
+async function saveExactStats() {
+
+  const player =
+    getSelectedPlayer();
+
+
+  if (!player) {
+
+    el("statsMessage").textContent =
+      "Choose a saved player first.";
+
+    return;
+
+  }
+
+
+  const total180s =
+    Number(
+      el("edit180s")
+      .value
+    );
+
+  const checkout =
+    Number(
+      el("editCheckout")
+      .value
+    );
+
+  const total30s =
+    Number(
+      el("edit30s")
+      .value
+    );
+
+
+  if (
+    total180s < 0 ||
+    total30s < 0 ||
+    checkout < 0 ||
+    checkout > 170
+  ) {
+
+    el("statsMessage").textContent =
+      "Check the numbers you entered.";
+
+    return;
+
+  }
+
+
+  const { error } =
+    await db
+      .from("player_stats")
+      .update({
+        total_180s:
+          total180s,
+        highest_checkout:
+          checkout,
+        dominoes_3_0s:
+          total30s
+      })
+      .eq(
+        "id",
+        player.id
+      );
+
+
+  if (error) {
+
+    el("statsMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  await loadPlayers(
+    player.id
+  );
+
+
+  el("statsMessage").textContent =
+    "✅ Player stats corrected";
+
+}
+
+
+// ============================
+// DELETE PLAYER
+// ============================
+
+async function deleteSelectedPlayer() {
+
+  const player =
+    getSelectedPlayer();
+
+
+  if (!player) {
+
+    el("statsMessage").textContent =
+      "Choose a saved player first.";
+
+    return;
+
+  }
+
+
+  const sure =
+    confirm(
+      "Delete " +
+      player.player_name +
+      " from " +
+      player.team +
+      "?"
+    );
+
+
+  if (!sure) {
+    return;
+  }
+
+
+  const { error } =
+    await db
+      .from("player_stats")
+      .delete()
+      .eq(
+        "id",
+        player.id
+      );
+
+
+  if (error) {
+
+    el("statsMessage").textContent =
+      "Error: " +
+      error.message;
+
+    return;
+
+  }
+
+
+  await loadPlayers();
+
+
+  el("statsMessage").textContent =
+    "✅ Player deleted";
+
+}
+
+
+// ============================
+// BUTTONS & EVENTS
+// ============================
+
+el("loginButton")
+.addEventListener(
+  "click",
+  login
+);
+
+
+el("logoutButton")
+.addEventListener(
+  "click",
+  logout
+);
+
+
+el("weekSelect")
+.addEventListener(
+  "change",
+  loadFixtures
+);
+
+
+el("fixtureSelect")
+.addEventListener(
+  "change",
+  showFixture
+);
+
+
+el("saveResultButton")
+.addEventListener(
+  "click",
+  saveResult
+);
+
+
+el("loadResultsButton")
+.addEventListener(
+  "click",
+  loadSavedResults
+);
+
+
+el("savedResultSelect")
+.addEventListener(
+  "change",
+  showSavedResult
+);
+
+
+el("updateResultButton")
+.addEventListener(
+  "click",
+  updateSavedResult
+);
+
+
+el("deleteResultButton")
+.addEventListener(
+  "click",
+  deleteSavedResult
+);
+
+
+el("saveCurrentWeekButton")
+.addEventListener(
+  "click",
+  saveCurrentWeek
+);
+
+
+el("savedPlayerSelect")
+.addEventListener(
+  "change",
+  showSelectedPlayer
+);
+
+
+el("refreshPlayersButton")
+.addEventListener(
+  "click",
+  () =>
+    loadPlayers(
+      el("savedPlayerSelect").value
+    )
+);
+
+
+el("add180Button")
+.addEventListener(
+  "click",
+  () =>
+    addStat(
+      "total_180s"
+    )
+);
+
+
+el("add30Button")
+.addEventListener(
+  "click",
+  () =>
+    addStat(
+      "dominoes_3_0s"
+    )
+);
+
+
+el("saveCheckoutButton")
+.addEventListener(
+  "click",
+  saveHighestCheckout
+);
+
+
+el("saveExactStatsButton")
+.addEventListener(
+  "click",
+  saveExactStats
+);
+
+
+el("deletePlayerButton")
+.addEventListener(
+  "click",
+  deleteSelectedPlayer
+);
+
+
+el("addPlayerButton")
+.addEventListener(
+  "click",
+  addNewPlayer
+);
+
+
+el("password")
+.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key ===
+      "Enter"
+    ) {
+
+      login();
+
+    }
+
+  }
+);
+
+
+// ============================
+// START
+// ============================
 
 generateFixtures();
+
 loadWeeks();
+
+buildCurrentWeekList();
+
 loadPlayerTeams();
-loadCurrentWeek();
+
 checkSession();
+
 </script>
+
 </body>
+
 </html>
