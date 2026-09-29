@@ -8,66 +8,7 @@
 <title>Monday Nite Darts & Dominoes League</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-/* =========================
-   MOBILE FRIENDLY
-   ========================= */
 
-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-nav a {
-  background: #334155;
-  padding: 9px 12px;
-  border-radius: 6px;
-  margin: 0;
-}
-
-@media (max-width: 600px) {
-
-  header {
-    padding: 15px 8px;
-  }
-
-  header h1 {
-    font-size: 22px;
-  }
-
-  nav {
-    padding: 10px 5px;
-  }
-
-  nav a {
-    font-size: 14px;
-    padding: 8px 9px;
-  }
-
-  .container {
-    padding: 10px;
-  }
-
-  .card {
-    padding: 10px;
-  }
-
-  table {
-    font-size: 13px;
-  }
-
-  th,
-  td {
-    padding: 8px 5px;
-  }
-
-  button,
-  input,
-  select {
-    font-size: 16px;
-  }
-}
 <style>
 
 body {
@@ -93,13 +34,20 @@ nav {
   background: #1e293b;
   text-align: center;
   padding: 12px;
+
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 nav a {
   color: white;
   text-decoration: none;
-  margin: 8px;
   font-weight: bold;
+  background: #334155;
+  padding: 9px 12px;
+  border-radius: 6px;
 }
 
 nav a:hover {
@@ -151,13 +99,56 @@ td:nth-child(2) {
   font-weight: bold;
 }
 
+.points {
+  color: #facc15;
+  font-weight: bold;
+}
+
 .message {
   text-align: center;
   padding: 15px;
   color: #cbd5e1;
 }
 
+@media (max-width: 600px) {
+
+  header {
+    padding: 15px 8px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+
+  nav {
+    padding: 10px 5px;
+  }
+
+  nav a {
+    font-size: 14px;
+    padding: 8px 9px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  th,
+  td {
+    padding: 8px 5px;
+  }
+}
+
 </style>
+
 </head>
 
 <body>
@@ -206,6 +197,7 @@ Loading league table...
 
 </div>
 
+
 <script>
 
 const SUPABASE_URL =
@@ -239,27 +231,40 @@ const teams = [
 ];
 
 
+// ============================
+// LOAD LEAGUE TABLE
+// ============================
+
 async function loadLeagueTable() {
 
   const table =
-    document.getElementById("leagueTable");
+    document.getElementById(
+      "leagueTable"
+    );
 
   const message =
-    document.getElementById("message");
+    document.getElementById(
+      "message"
+    );
 
 
   const league =
-    teams.map(team => ({
-      team: team,
-      played: 0,
-      won: 0,
-      drawn: 0,
-      lost: 0,
-      points: 0
-    }));
+    teams.map(
+      team => ({
+        team: team,
+        played: 0,
+        won: 0,
+        drawn: 0,
+        lost: 0,
+        points: 0
+      })
+    );
 
 
-  const { data, error } =
+  const {
+    data,
+    error
+  } =
     await db
       .from("results")
       .select("*");
@@ -268,111 +273,160 @@ async function loadLeagueTable() {
   if (error) {
 
     message.textContent =
-      "Unable to load table: " +
-      error.message;
+      "Unable to load league table.";
 
     return;
-
   }
 
 
-  data.forEach(result => {
+  (data || []).forEach(
+    result => {
 
-    const home =
-      league.find(
-        t => t.team === result.home_team
+      const home =
+        league.find(
+          t =>
+            t.team ===
+            result.home_team
+        );
+
+      const away =
+        league.find(
+          t =>
+            t.team ===
+            result.away_team
+        );
+
+
+      if (
+        !home ||
+        !away
+      ) {
+
+        return;
+      }
+
+
+      const homeScore =
+        Number(
+          result.home_score
+        );
+
+      const awayScore =
+        Number(
+          result.away_score
+        );
+
+
+      home.played++;
+      away.played++;
+
+
+      home.points +=
+        homeScore;
+
+      away.points +=
+        awayScore;
+
+
+      if (
+        homeScore >
+        awayScore
+      ) {
+
+        home.won++;
+        away.lost++;
+
+      }
+
+      else if (
+        awayScore >
+        homeScore
+      ) {
+
+        away.won++;
+        home.lost++;
+
+      }
+
+      else {
+
+        home.drawn++;
+        away.drawn++;
+
+      }
+
+    }
+  );
+
+
+  league.sort(
+    (a, b) => {
+
+      if (
+        b.points !==
+        a.points
+      ) {
+
+        return (
+          b.points -
+          a.points
+        );
+
+      }
+
+
+      if (
+        b.won !==
+        a.won
+      ) {
+
+        return (
+          b.won -
+          a.won
+        );
+
+      }
+
+
+      return (
+        a.team.localeCompare(
+          b.team
+        )
       );
 
-    const away =
-      league.find(
-        t => t.team === result.away_team
-      );
-
-
-    if (!home || !away) {
-      return;
     }
-
-
-    home.played++;
-    away.played++;
-
-
-    home.points +=
-      Number(result.home_score);
-
-    away.points +=
-      Number(result.away_score);
-
-
-    if (
-      result.home_score >
-      result.away_score
-    ) {
-
-      home.won++;
-      away.lost++;
-
-    }
-
-    else if (
-      result.home_score <
-      result.away_score
-    ) {
-
-      away.won++;
-      home.lost++;
-
-    }
-
-    else {
-
-      home.drawn++;
-      away.drawn++;
-
-    }
-
-  });
-
-
-  league.sort((a, b) => {
-
-    if (b.points !== a.points) {
-      return b.points - a.points;
-    }
-
-    if (b.won !== a.won) {
-      return b.won - a.won;
-    }
-
-    return a.team.localeCompare(b.team);
-
-  });
+  );
 
 
   table.innerHTML = "";
 
 
-  league.forEach((team, index) => {
+  league.forEach(
+    (team, index) => {
 
-    const row =
-      document.createElement("tr");
-
-
-    row.innerHTML = `
-      <td class="position">${index + 1}</td>
-      <td>${team.team}</td>
-      <td>${team.played}</td>
-      <td>${team.won}</td>
-      <td>${team.drawn}</td>
-      <td>${team.lost}</td>
-      <td><strong>${team.points}</strong></td>
-    `;
+      const row =
+        document.createElement(
+          "tr"
+        );
 
 
-    table.appendChild(row);
+      row.innerHTML = `
+        <td class="position">${index + 1}</td>
+        <td>${team.team}</td>
+        <td>${team.played}</td>
+        <td>${team.won}</td>
+        <td>${team.drawn}</td>
+        <td>${team.lost}</td>
+        <td class="points">${team.points}</td>
+      `;
 
-  });
+
+      table.appendChild(
+        row
+      );
+
+    }
+  );
 
 
   message.style.display =
@@ -380,6 +434,10 @@ async function loadLeagueTable() {
 
 }
 
+
+// ============================
+// START
+// ============================
 
 loadLeagueTable();
 
