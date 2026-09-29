@@ -121,7 +121,6 @@ td {
 }
 
 @media (max-width: 600px) {
-
   header {
     padding: 15px 8px;
   }
@@ -162,7 +161,6 @@ td {
 }
 
 </style>
-
 </head>
 
 <body>
@@ -180,7 +178,6 @@ td {
 </nav>
 
 <div class="container">
-
 <div class="card">
 
 <h2>📅 Fixtures</h2>
@@ -190,17 +187,11 @@ Loading current week...
 </div>
 
 <div class="week-box">
-
-<label for="weekSelect">
-<strong>Select Week:</strong>
-</label>
-
+<label for="weekSelect"><strong>Select Week:</strong></label>
 <select id="weekSelect"></select>
-
 </div>
 
 <table>
-
 <thead>
 <tr>
 <th>Home</th>
@@ -208,15 +199,11 @@ Loading current week...
 <th>Away</th>
 </tr>
 </thead>
-
 <tbody id="fixturesTable"></tbody>
-
 </table>
 
 </div>
-
 </div>
-
 
 <script>
 
@@ -226,20 +213,17 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
 
-const { createClient } = supabase;
-
 const db =
-  createClient(
+  supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
-
 
 const teams = [
   "Crown A",
   "Punch",
   "ICI",
-  "Golden Cup",
+  "The Anchor",
   "The Park Inn",
   "Bird in Hand",
   "Victoria A",
@@ -247,209 +231,110 @@ const teams = [
   "Funky Room",
   "Entwistle",
   "Crown B",
-  "Victoria B"
+  "Victoria B",
+  "Coopers Bar",
+  "Darwen Football Club"
 ];
 
+const WEEKS_PER_HALF = teams.length - 1;
+const MATCHES_PER_WEEK = teams.length / 2;
+const TOTAL_WEEKS = WEEKS_PER_HALF * 2;
 
 let fixtures = [];
-
 let savedResults = [];
 
-
-// ============================
-// HOME CHECK
-// ============================
-
 function isHome(matches, team) {
+  const match = matches.find(
+    m => m.home === team || m.away === team
+  );
 
-  const match =
-    matches.find(
-      m =>
-        m.home === team ||
-        m.away === team
-    );
-
-  if (!match) {
-    return false;
-  }
-
-  return match.home === team;
+  return match ? match.home === team : false;
 }
 
+function orientRound(pairs, roundNumber) {
 
-// ============================
-// ORIENT ROUND
-// ============================
-
-function orientRound(
-  pairs,
-  roundNumber
-) {
-
-  const defaults =
-    pairs.map(
-      (pair, index) => {
-
-        if (
-          (index + roundNumber) % 2 === 0
-        ) {
-
-          return {
-            home: pair[0],
-            away: pair[1]
-          };
-
-        }
-
-        return {
-          home: pair[1],
-          away: pair[0]
-        };
-
-      }
-    );
-
-
-  let best = null;
-  let bestFlips = 999;
-
-
-  for (
-    let mask = 0;
-    mask < 64;
-    mask++
-  ) {
-
-    const matches =
-      defaults.map(
-        (match, index) => {
-
-          if (
-            mask & (1 << index)
-          ) {
-
-            return {
-              home: match.away,
-              away: match.home
-            };
-
-          }
-
-          return {
-            home: match.home,
-            away: match.away
-          };
-
-        }
-      );
-
-
-    const crownsOK =
-      isHome(
-        matches,
-        "Crown A"
-      )
-      !==
-      isHome(
-        matches,
-        "Crown B"
-      );
-
-
-    const victoriasOK =
-      isHome(
-        matches,
-        "Victoria A"
-      )
-      !==
-      isHome(
-        matches,
-        "Victoria B"
-      );
-
-
-    if (
-      crownsOK &&
-      victoriasOK
-    ) {
-
-      let flips = 0;
-
-
-      for (
-        let i = 0;
-        i < 6;
-        i++
-      ) {
-
-        if (
-          mask & (1 << i)
-        ) {
-          flips++;
-        }
-
-      }
-
-
-      if (
-        flips < bestFlips
-      ) {
-
-        best = matches;
-        bestFlips = flips;
-
-      }
-
+  const defaults = pairs.map((pair, index) => {
+    if ((index + roundNumber) % 2 === 0) {
+      return {
+        home: pair[0],
+        away: pair[1]
+      };
     }
 
+    return {
+      home: pair[1],
+      away: pair[0]
+    };
+  });
+
+  let best = defaults;
+  let bestFlips = Infinity;
+  const combinations = 1 << pairs.length;
+
+  for (let mask = 0; mask < combinations; mask++) {
+
+    const matches = defaults.map((match, index) => {
+      if (mask & (1 << index)) {
+        return {
+          home: match.away,
+          away: match.home
+        };
+      }
+
+      return {
+        home: match.home,
+        away: match.away
+      };
+    });
+
+    const crownsOK =
+      isHome(matches, "Crown A") !==
+      isHome(matches, "Crown B");
+
+    const victoriasOK =
+      isHome(matches, "Victoria A") !==
+      isHome(matches, "Victoria B");
+
+    if (crownsOK && victoriasOK) {
+      let flips = 0;
+
+      for (let i = 0; i < pairs.length; i++) {
+        if (mask & (1 << i)) {
+          flips++;
+        }
+      }
+
+      if (flips < bestFlips) {
+        best = matches;
+        bestFlips = flips;
+      }
+    }
   }
 
   return best;
 }
 
-
-// ============================
-// FIRST 11 WEEKS
-// ============================
-
 function generateFirstHalf() {
 
-  const fixedTeam =
-    teams[0];
-
-  let rotating =
-    teams.slice(1);
-
+  const fixedTeam = teams[0];
+  let rotating = teams.slice(1);
   const rounds = [];
 
+  for (let round = 0; round < WEEKS_PER_HALF; round++) {
 
-  for (
-    let round = 0;
-    round < 11;
-    round++
-  ) {
-
-    const currentTeams = [
+    const current = [
       fixedTeam,
       ...rotating
     ];
 
     const pairs = [];
 
-
-    for (
-      let i = 0;
-      i < 6;
-      i++
-    ) {
-
+    for (let i = 0; i < MATCHES_PER_WEEK; i++) {
       pairs.push([
-        currentTeams[i],
-        currentTeams[11 - i]
+        current[i],
+        current[current.length - 1 - i]
       ]);
-
     }
-
 
     rounds.push(
       orientRound(
@@ -458,44 +343,29 @@ function generateFirstHalf() {
       )
     );
 
-
-    const last =
-      rotating.pop();
-
     rotating.unshift(
-      last
+      rotating.pop()
     );
-
   }
-
 
   return rounds;
 }
-
-
-// ============================
-// ALL 22 WEEKS
-// ============================
 
 function generateFixtures() {
 
   const firstHalf =
     generateFirstHalf();
 
-
   const secondHalf =
     firstHalf.map(
       round =>
-
         round.map(
           match => ({
             home: match.away,
             away: match.home
           })
         )
-
     );
-
 
   fixtures = [
     ...firstHalf,
@@ -503,32 +373,17 @@ function generateFixtures() {
   ];
 }
 
-
-// ============================
-// LOAD WEEK DROPDOWN
-// ============================
-
 function loadWeeks() {
 
   const select =
-    document.getElementById(
-      "weekSelect"
-    );
-
+    document.getElementById("weekSelect");
 
   select.innerHTML = "";
 
-
-  for (
-    let week = 1;
-    week <= 22;
-    week++
-  ) {
+  for (let week = 1; week <= TOTAL_WEEKS; week++) {
 
     const option =
-      document.createElement(
-        "option"
-      );
+      document.createElement("option");
 
     option.value =
       week - 1;
@@ -536,24 +391,14 @@ function loadWeeks() {
     option.textContent =
       "Week " + week;
 
-    select.appendChild(
-      option
-    );
-
+    select.appendChild(option);
   }
-
 
   select.addEventListener(
     "change",
     showFixtures
   );
-
 }
-
-
-// ============================
-// LOAD SAVED RESULTS
-// ============================
 
 async function loadResults() {
 
@@ -565,115 +410,61 @@ async function loadResults() {
       .from("results")
       .select("*");
 
-
-  if (error) {
-
-    savedResults = [];
-
-    return;
-
-  }
-
-
   savedResults =
-    data || [];
-
+    error ? [] : (data || []);
 }
-
-
-// ============================
-// SHOW FIXTURES
-// ============================
 
 function showFixtures() {
 
   const weekIndex =
     Number(
-      document.getElementById(
-        "weekSelect"
-      ).value
+      document.getElementById("weekSelect").value
     );
-
 
   const weekNumber =
     weekIndex + 1;
 
-
   const table =
-    document.getElementById(
-      "fixturesTable"
-    );
-
+    document.getElementById("fixturesTable");
 
   table.innerHTML = "";
 
-
   fixtures[weekIndex]
-  .forEach(
-    match => {
+  .forEach(match => {
 
-      const saved =
-        savedResults.find(
-          result =>
-            Number(result.week) === weekNumber &&
-            result.home_team === match.home &&
-            result.away_team === match.away
-        );
-
-
-      let middleText = "V";
-
-
-      if (saved) {
-
-        middleText =
-          saved.home_score +
-          " - " +
-          saved.away_score;
-
-      }
-
-
-      const row =
-        document.createElement(
-          "tr"
-        );
-
-
-      row.innerHTML = `
-        <td class="home">${match.home}</td>
-        <td class="middle">${middleText}</td>
-        <td>${match.away}</td>
-      `;
-
-
-      table.appendChild(
-        row
+    const saved =
+      savedResults.find(
+        result =>
+          Number(result.week) === weekNumber &&
+          result.home_team === match.home &&
+          result.away_team === match.away
       );
 
-    }
-  );
+    const middleText =
+      saved
+        ? saved.home_score + " - " + saved.away_score
+        : "V";
 
+    const row =
+      document.createElement("tr");
+
+    row.innerHTML = `
+      <td class="home">${match.home}</td>
+      <td class="middle">${middleText}</td>
+      <td>${match.away}</td>
+    `;
+
+    table.appendChild(row);
+  });
 }
-
-
-// ============================
-// LOAD CURRENT WEEK
-// ============================
 
 async function loadCurrentWeek() {
 
   const display =
-    document.getElementById(
-      "currentWeekDisplay"
-    );
-
+    document.getElementById("currentWeekDisplay");
 
   const select =
-    document.getElementById(
-      "weekSelect"
-    );
-
+    document.getElementById("weekSelect");
 
   const {
     data,
@@ -685,67 +476,34 @@ async function loadCurrentWeek() {
       .eq("id", 1)
       .single();
 
-
-  if (error) {
-
-    display.textContent =
-      "📅 Current League Week";
-
-    select.value = 0;
-
-    showFixtures();
-
-    return;
-
-  }
-
-
   let currentWeek =
-    Number(
-      data.current_week
-    );
-
+    error
+      ? 1
+      : Number(data.current_week);
 
   if (
     currentWeek < 1 ||
-    currentWeek > 22
+    currentWeek > TOTAL_WEEKS
   ) {
-
     currentWeek = 1;
-
   }
-
 
   display.textContent =
     "📅 Current League Week: Week " +
     currentWeek;
 
-
   select.value =
     currentWeek - 1;
 
-
   showFixtures();
-
 }
-
-
-// ============================
-// START
-// ============================
 
 async function startPage() {
-
   generateFixtures();
-
   loadWeeks();
-
   await loadResults();
-
   await loadCurrentWeek();
-
 }
-
 
 startPage();
 
