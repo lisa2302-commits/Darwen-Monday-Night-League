@@ -34,7 +34,6 @@ nav {
   background: #1e293b;
   text-align: center;
   padding: 12px;
-
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -58,6 +57,17 @@ nav a:hover {
   max-width: 1000px;
   margin: auto;
   padding: 15px;
+}
+
+.current-week {
+  background: #1e293b;
+  color: #facc15;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
 }
 
 .card {
@@ -148,7 +158,6 @@ td:nth-child(2) {
 }
 
 </style>
-
 </head>
 
 <body>
@@ -166,6 +175,10 @@ td:nth-child(2) {
 </nav>
 
 <div class="container">
+
+<div id="currentWeek" class="current-week">
+📅 Loading current league week...
+</div>
 
 <div class="card">
 
@@ -232,7 +245,43 @@ const teams = [
 
 
 // ============================
-// LOAD LEAGUE TABLE
+// CURRENT WEEK
+// ============================
+
+async function loadCurrentWeek() {
+
+  const box =
+    document.getElementById(
+      "currentWeek"
+    );
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("league_settings")
+      .select("current_week")
+      .eq("id", 1)
+      .single();
+
+  if (error) {
+
+    box.textContent =
+      "📅 Current League Week";
+
+    return;
+  }
+
+  box.textContent =
+    "📅 Current League Week: Week " +
+    data.current_week;
+
+}
+
+
+// ============================
+// LEAGUE TABLE
 // ============================
 
 async function loadLeagueTable() {
@@ -297,11 +346,7 @@ async function loadLeagueTable() {
         );
 
 
-      if (
-        !home ||
-        !away
-      ) {
-
+      if (!home || !away) {
         return;
       }
 
@@ -320,28 +365,18 @@ async function loadLeagueTable() {
       home.played++;
       away.played++;
 
-
-      home.points +=
-        homeScore;
-
-      away.points +=
-        awayScore;
+      home.points += homeScore;
+      away.points += awayScore;
 
 
-      if (
-        homeScore >
-        awayScore
-      ) {
+      if (homeScore > awayScore) {
 
         home.won++;
         away.lost++;
 
       }
 
-      else if (
-        awayScore >
-        homeScore
-      ) {
+      else if (awayScore > homeScore) {
 
         away.won++;
         home.lost++;
@@ -362,36 +397,16 @@ async function loadLeagueTable() {
   league.sort(
     (a, b) => {
 
-      if (
-        b.points !==
-        a.points
-      ) {
-
-        return (
-          b.points -
-          a.points
-        );
-
+      if (b.points !== a.points) {
+        return b.points - a.points;
       }
 
-
-      if (
-        b.won !==
-        a.won
-      ) {
-
-        return (
-          b.won -
-          a.won
-        );
-
+      if (b.won !== a.won) {
+        return b.won - a.won;
       }
 
-
-      return (
-        a.team.localeCompare(
-          b.team
-        )
+      return a.team.localeCompare(
+        b.team
       );
 
     }
@@ -409,7 +424,6 @@ async function loadLeagueTable() {
           "tr"
         );
 
-
       row.innerHTML = `
         <td class="position">${index + 1}</td>
         <td>${team.team}</td>
@@ -420,10 +434,7 @@ async function loadLeagueTable() {
         <td class="points">${team.points}</td>
       `;
 
-
-      table.appendChild(
-        row
-      );
+      table.appendChild(row);
 
     }
   );
@@ -438,6 +449,8 @@ async function loadLeagueTable() {
 // ============================
 // START
 // ============================
+
+loadCurrentWeek();
 
 loadLeagueTable();
 
