@@ -8,66 +8,7 @@
 <title>Results - Monday Nite League</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-/* =========================
-   MOBILE FRIENDLY
-   ========================= */
 
-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-nav a {
-  background: #334155;
-  padding: 9px 12px;
-  border-radius: 6px;
-  margin: 0;
-}
-
-@media (max-width: 600px) {
-
-  header {
-    padding: 15px 8px;
-  }
-
-  header h1 {
-    font-size: 22px;
-  }
-
-  nav {
-    padding: 10px 5px;
-  }
-
-  nav a {
-    font-size: 14px;
-    padding: 8px 9px;
-  }
-
-  .container {
-    padding: 10px;
-  }
-
-  .card {
-    padding: 10px;
-  }
-
-  table {
-    font-size: 13px;
-  }
-
-  th,
-  td {
-    padding: 8px 5px;
-  }
-
-  button,
-  input,
-  select {
-    font-size: 16px;
-  }
-}
 <style>
 
 body {
@@ -93,13 +34,20 @@ nav {
   background: #1e293b;
   text-align: center;
   padding: 12px;
+
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 nav a {
   color: white;
   text-decoration: none;
-  margin: 8px;
   font-weight: bold;
+  background: #334155;
+  padding: 9px 12px;
+  border-radius: 6px;
 }
 
 nav a:hover {
@@ -153,7 +101,49 @@ td {
   color: #cbd5e1;
 }
 
+@media (max-width: 600px) {
+
+  header {
+    padding: 15px 8px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+
+  nav {
+    padding: 10px 5px;
+  }
+
+  nav a {
+    font-size: 14px;
+    padding: 8px 9px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  th,
+  td {
+    padding: 8px 5px;
+  }
+
+  .score {
+    font-size: 16px;
+  }
+}
+
 </style>
+
 </head>
 
 <body>
@@ -217,96 +207,147 @@ const db =
   );
 
 
+// ============================
+// LOAD RESULTS
+// ============================
+
 async function loadResults() {
 
   const message =
-    document.getElementById("message");
+    document.getElementById(
+      "message"
+    );
 
   const table =
-    document.getElementById("resultsTable");
+    document.getElementById(
+      "resultsTable"
+    );
 
   const body =
-    document.getElementById("resultsBody");
+    document.getElementById(
+      "resultsBody"
+    );
 
 
-  const { data, error } =
+  const {
+    data,
+    error
+  } =
     await db
       .from("results")
       .select("*")
-      .order("week", { ascending: true })
-      .order("id", { ascending: true });
+      .order(
+        "week",
+        { ascending: true }
+      )
+      .order(
+        "id",
+        { ascending: true }
+      );
 
 
   if (error) {
 
     message.textContent =
-      "Unable to load results: " +
-      error.message;
+      "Unable to load results.";
 
     return;
-
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     message.textContent =
       "No results entered yet.";
 
-    table.style.display = "none";
+    table.style.display =
+      "none";
 
     return;
-
   }
 
 
   body.innerHTML = "";
 
 
-  data.forEach(result => {
+  data.forEach(
+    result => {
 
-    const row =
-      document.createElement("tr");
-
-    const weekCell =
-      document.createElement("td");
-
-    const homeCell =
-      document.createElement("td");
-
-    const scoreCell =
-      document.createElement("td");
-
-    const awayCell =
-      document.createElement("td");
+      const row =
+        document.createElement(
+          "tr"
+        );
 
 
-    weekCell.textContent =
-      result.week;
+      const weekCell =
+        document.createElement(
+          "td"
+        );
 
-    homeCell.textContent =
-      result.home_team;
+      const homeCell =
+        document.createElement(
+          "td"
+        );
 
-    scoreCell.textContent =
-      result.home_score +
-      " - " +
-      result.away_score;
+      const scoreCell =
+        document.createElement(
+          "td"
+        );
 
-    scoreCell.className =
-      "score";
+      const awayCell =
+        document.createElement(
+          "td"
+        );
 
-    awayCell.textContent =
-      result.away_team;
+
+      weekCell.textContent =
+        "Week " +
+        result.week;
 
 
-    row.appendChild(weekCell);
-    row.appendChild(homeCell);
-    row.appendChild(scoreCell);
-    row.appendChild(awayCell);
+      homeCell.textContent =
+        result.home_team;
 
-    body.appendChild(row);
 
-  });
+      scoreCell.textContent =
+        result.home_score +
+        " - " +
+        result.away_score;
+
+      scoreCell.className =
+        "score";
+
+
+      awayCell.textContent =
+        result.away_team;
+
+
+      row.appendChild(
+        weekCell
+      );
+
+      row.appendChild(
+        homeCell
+      );
+
+      row.appendChild(
+        scoreCell
+      );
+
+      row.appendChild(
+        awayCell
+      );
+
+
+      body.appendChild(
+        row
+      );
+
+    }
+  );
 
 
   message.style.display =
@@ -317,6 +358,10 @@ async function loadResults() {
 
 }
 
+
+// ============================
+// START
+// ============================
 
 loadResults();
 
