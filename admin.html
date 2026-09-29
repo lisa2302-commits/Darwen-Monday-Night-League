@@ -5,66 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin - Monday Nite League</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- /* =========================
-   MOBILE FRIENDLY
-   ========================= */
-
-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-nav a {
-  background: #334155;
-  padding: 9px 12px;
-  border-radius: 6px;
-  margin: 0;
-}
-
-@media (max-width: 600px) {
-
-  header {
-    padding: 15px 8px;
-  }
-
-  header h1 {
-    font-size: 22px;
-  }
-
-  nav {
-    padding: 10px 5px;
-  }
-
-  nav a {
-    font-size: 14px;
-    padding: 8px 9px;
-  }
-
-  .container {
-    padding: 10px;
-  }
-
-  .card {
-    padding: 10px;
-  }
-
-  table {
-    font-size: 13px;
-  }
-
-  th,
-  td {
-    padding: 8px 5px;
-  }
-
-  button,
-  input,
-  select {
-    font-size: 16px;
-  }
-} 
 <style>
 body{font-family:Arial,sans-serif;background:#111827;color:white;margin:0}
 header{background:#0f172a;padding:20px;text-align:center;border-bottom:3px solid #facc15}
@@ -83,6 +23,34 @@ button:hover{opacity:.9}
 .message{text-align:center;margin-top:12px;font-weight:bold}
 .fixture-name{background:#334155;padding:12px;border-radius:6px;text-align:center;margin:10px 0;line-height:1.5}
 .danger,.logout{background:#ef4444;color:white}
+
+/* =========================
+   MOBILE FRIENDLY
+   ========================= */
+nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+nav a {
+  background: #334155;
+  padding: 9px 12px;
+  border-radius: 6px;
+  margin: 0;
+}
+@media (max-width: 600px) {
+  header { padding: 15px 8px; }
+  header h1 { font-size: 22px; }
+  nav { padding: 10px 5px; }
+  nav a { font-size: 14px; padding: 8px 9px; }
+  .container { padding: 10px; }
+  .card { padding: 10px; }
+  table { font-size: 13px; }
+  th, td { padding: 8px 5px; }
+  button, input, select { font-size: 16px; }
+}
+
 </style>
 </head>
 <body>
@@ -119,21 +87,16 @@ button:hover{opacity:.9}
       <button id="saveResultButton" type="button">✅ Save Result</button>
       <div id="saveMessage" class="message"></div>
     </div>
-<div class="card">
 
-<h2>📅 Current League Week</h2>
 
-<label>Select Current Week</label>
+    <div class="card">
+      <h2>📅 Current League Week</h2>
+      <label for="currentWeekSelect">Select Current Week</label>
+      <select id="currentWeekSelect"></select>
+      <button id="saveCurrentWeekButton" type="button">✅ Save Current Week</button>
+      <div id="currentWeekMessage" class="message"></div>
+    </div>
 
-<select id="currentWeekSelect"></select>
-
-<button onclick="saveCurrentWeek()">
-✅ Save Current Week
-</button>
-
-<div id="currentWeekMessage" class="message"></div>
-
-</div>
     <div class="card">
       <h2>🛠 Manage Results</h2>
       <button id="loadResultsButton" type="button">Load Saved Results</button>
@@ -443,12 +406,56 @@ async function saveHighestCheckout(){
   }catch(error){ el("statsMessage").textContent = "Error: " + error.message; }
 }
 
+
+async function loadCurrentWeek(){
+  const select = el("currentWeekSelect");
+  select.innerHTML = "";
+  for(let week=1; week<=22; week++){
+    const option = document.createElement("option");
+    option.value = week;
+    option.textContent = "Week " + week;
+    select.appendChild(option);
+  }
+
+  const { data, error } = await db.from("league_settings")
+    .select("current_week")
+    .eq("id",1)
+    .single();
+
+  if(error){
+    el("currentWeekMessage").textContent = "Unable to load current week: " + error.message;
+    return;
+  }
+
+  select.value = String(data.current_week);
+  el("currentWeekMessage").textContent = "Current week is Week " + data.current_week;
+}
+
+async function saveCurrentWeek(){
+  const week = Number(el("currentWeekSelect").value);
+  const message = el("currentWeekMessage");
+  if(!week){
+    message.textContent = "Choose a week first.";
+    return;
+  }
+  message.textContent = "Saving...";
+  const { error } = await db.from("league_settings")
+    .update({ current_week: week })
+    .eq("id",1);
+  if(error){
+    message.textContent = "Error: " + error.message;
+    return;
+  }
+  message.textContent = "✅ Current week set to Week " + week;
+}
+
 el("loginButton").addEventListener("click", login);
 el("logoutButton").addEventListener("click", logout);
 el("weekSelect").addEventListener("change", loadFixtures);
 el("fixtureSelect").addEventListener("change", showFixture);
 el("saveResultButton").addEventListener("click", saveResult);
 el("loadResultsButton").addEventListener("click", loadSavedResults);
+el("saveCurrentWeekButton").addEventListener("click", saveCurrentWeek);
 el("savedResultSelect").addEventListener("change", showSavedResult);
 el("updateResultButton").addEventListener("click", updateSavedResult);
 el("deleteResultButton").addEventListener("click", deleteSavedResult);
@@ -463,95 +470,8 @@ el("password").addEventListener("keydown", event => { if(event.key === "Enter") 
 generateFixtures();
 loadWeeks();
 loadPlayerTeams();
- loadCurrentWeek();
+loadCurrentWeek();
 checkSession();
 </script>
- // ============================
-// CURRENT WEEK
-// ============================
-
-async function loadCurrentWeek() {
-
-  const select =
-    document.getElementById("currentWeekSelect");
-
-  select.innerHTML = "";
-
-  for (let week = 1; week <= 22; week++) {
-
-    const option =
-      document.createElement("option");
-
-    option.value = week;
-    option.textContent = "Week " + week;
-
-    select.appendChild(option);
-
-  }
-
-  const { data, error } =
-    await db
-      .from("league_settings")
-      .select("current_week")
-      .eq("id", 1)
-      .single();
-
-  if (error) {
-
-    document.getElementById(
-      "currentWeekMessage"
-    ).textContent =
-      "Unable to load current week.";
-
-    return;
-  }
-
-  select.value =
-    data.current_week;
-
-}
-
-
-// ============================
-// SAVE CURRENT WEEK
-// ============================
-
-async function saveCurrentWeek() {
-
-  const week =
-    Number(
-      document.getElementById(
-        "currentWeekSelect"
-      ).value
-    );
-
-  const message =
-    document.getElementById(
-      "currentWeekMessage"
-    );
-
-  message.textContent =
-    "Saving...";
-
-  const { error } =
-    await db
-      .from("league_settings")
-      .update({
-        current_week: week
-      })
-      .eq("id", 1);
-
-  if (error) {
-
-    message.textContent =
-      "Error: " + error.message;
-
-    return;
-  }
-
-  message.textContent =
-    "✅ Current week set to Week " + week;
-
-}
 </body>
 </html>
