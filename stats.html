@@ -1,3 +1,4 @@
+You
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,66 +9,7 @@
 <title>Stats - Monday Nite League</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-/* =========================
-   MOBILE FRIENDLY
-   ========================= */
 
-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-nav a {
-  background: #334155;
-  padding: 9px 12px;
-  border-radius: 6px;
-  margin: 0;
-}
-
-@media (max-width: 600px) {
-
-  header {
-    padding: 15px 8px;
-  }
-
-  header h1 {
-    font-size: 22px;
-  }
-
-  nav {
-    padding: 10px 5px;
-  }
-
-  nav a {
-    font-size: 14px;
-    padding: 8px 9px;
-  }
-
-  .container {
-    padding: 10px;
-  }
-
-  .card {
-    padding: 10px;
-  }
-
-  table {
-    font-size: 13px;
-  }
-
-  th,
-  td {
-    padding: 8px 5px;
-  }
-
-  button,
-  input,
-  select {
-    font-size: 16px;
-  }
-}
 <style>
 
 body {
@@ -93,13 +35,20 @@ nav {
   background: #1e293b;
   text-align: center;
   padding: 12px;
+
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 nav a {
   color: white;
   text-decoration: none;
-  margin: 8px;
   font-weight: bold;
+  background: #334155;
+  padding: 9px 12px;
+  border-radius: 6px;
 }
 
 nav a:hover {
@@ -164,7 +113,49 @@ td:nth-child(3) {
   padding: 20px;
 }
 
+@media (max-width: 600px) {
+
+  header {
+    padding: 15px 8px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+
+  nav {
+    padding: 10px 5px;
+  }
+
+  nav a {
+    font-size: 14px;
+    padding: 8px 9px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  th,
+  td {
+    padding: 8px 5px;
+  }
+
+  .stat-number {
+    font-size: 16px;
+  }
+}
+
 </style>
+
 </head>
 
 <body>
@@ -182,6 +173,8 @@ td:nth-child(3) {
 </nav>
 
 <div class="container">
+
+<!-- MOST 180s -->
 
 <div class="card">
 
@@ -209,6 +202,8 @@ Loading 180s...
 </div>
 
 
+<!-- HIGHEST CHECKOUT -->
+
 <div class="card">
 
 <h2>🔥 Highest Checkout</h2>
@@ -234,6 +229,8 @@ Loading checkouts...
 
 </div>
 
+
+<!-- DOMINOES 3-0s -->
 
 <div class="card">
 
@@ -266,21 +263,23 @@ Loading dominoes 3–0s...
 <script>
 
 const SUPABASE_URL =
-"https://zczdgjwmewgbkgxoqplm.supabase.co";
+  "https://zczdgjwmewgbkgxoqplm.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
+  "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
 
 const { createClient } = supabase;
 
 const db =
-createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
+// ============================
 // LOAD ALL STATS
+// ============================
 
 async function loadStats() {
 
@@ -288,208 +287,333 @@ async function loadStats() {
     data,
     error
   } =
-  await db
-    .from("player_stats")
-    .select("*");
+    await db
+      .from("player_stats")
+      .select("*");
 
 
   if (error) {
 
-    document.getElementById("message180")
-    .textContent =
-    "Unable to load stats.";
+    document.getElementById(
+      "message180"
+    ).textContent =
+      "Unable to load stats.";
 
-    document.getElementById("checkoutMessage")
-    .textContent =
-    "Unable to load stats.";
+    document.getElementById(
+      "checkoutMessage"
+    ).textContent =
+      "Unable to load stats.";
 
-    document.getElementById("dominoesMessage")
-    .textContent =
-    "Unable to load stats.";
+    document.getElementById(
+      "dominoesMessage"
+    ).textContent =
+      "Unable to load stats.";
 
     return;
   }
 
 
-  show180s(data || []);
-  showCheckouts(data || []);
-  showDominoes(data || []);
+  const stats =
+    data || [];
+
+
+  show180s(stats);
+
+  showCheckouts(stats);
+
+  showDominoes(stats);
 
 }
 
 
+// ============================
 // MOST 180s
+// ============================
 
 function show180s(data) {
 
   const players =
-  [...data]
-  .filter(player =>
-    Number(player.total_180s) > 0
-  )
-  .sort((a, b) =>
-    Number(b.total_180s) -
-    Number(a.total_180s)
-  );
+    [...data]
+      .filter(
+        player =>
+          Number(
+            player.total_180s
+          ) > 0
+      )
+      .sort(
+        (a, b) =>
+          Number(
+            b.total_180s
+          ) -
+          Number(
+            a.total_180s
+          )
+      );
 
 
-  if (players.length === 0) {
+  const table =
+    document.getElementById(
+      "table180"
+    );
 
-    document.getElementById("message180")
-    .textContent =
-    "No 180s entered yet.";
+  const message =
+    document.getElementById(
+      "message180"
+    );
+
+  const body =
+    document.getElementById(
+      "body180"
+    );
+
+
+  if (
+    players.length === 0
+  ) {
+
+    table.style.display =
+      "none";
+
+    message.style.display =
+      "block";
+
+    message.textContent =
+      "No 180s entered yet.";
 
     return;
   }
 
 
-  const body =
-  document.getElementById("body180");
-
   body.innerHTML = "";
 
 
-  players.forEach((player, index) => {
+  players.forEach(
+    (player, index) => {
 
-    const row =
-    document.createElement("tr");
-
-    row.innerHTML = `
-      <td class="position">${index + 1}</td>
-      <td>${player.player_name}</td>
-      <td>${player.team}</td>
-      <td class="stat-number">${player.total_180s}</td>
-    `;
-
-    body.appendChild(row);
-
-  });
+      const row =
+        document.createElement(
+          "tr"
+        );
 
 
-  document.getElementById("message180")
-  .style.display = "none";
+      row.innerHTML = `
+        <td class="position">${index + 1}</td>
+        <td>${player.player_name}</td>
+        <td>${player.team}</td>
+        <td class="stat-number">${player.total_180s}</td>
+      `;
 
-  document.getElementById("table180")
-  .style.display = "table";
+
+      body.appendChild(
+        row
+      );
+
+    }
+  );
+
+
+  message.style.display =
+    "none";
+
+  table.style.display =
+    "table";
 
 }
 
 
+// ============================
 // HIGHEST CHECKOUT
+// ============================
 
 function showCheckouts(data) {
 
   const players =
-  [...data]
-  .filter(player =>
-    Number(player.highest_checkout) > 0
-  )
-  .sort((a, b) =>
-    Number(b.highest_checkout) -
-    Number(a.highest_checkout)
-  );
+    [...data]
+      .filter(
+        player =>
+          Number(
+            player.highest_checkout
+          ) > 0
+      )
+      .sort(
+        (a, b) =>
+          Number(
+            b.highest_checkout
+          ) -
+          Number(
+            a.highest_checkout
+          )
+      );
 
 
-  if (players.length === 0) {
+  const table =
+    document.getElementById(
+      "checkoutTable"
+    );
 
-    document.getElementById("checkoutMessage")
-    .textContent =
-    "No checkouts entered yet.";
+  const message =
+    document.getElementById(
+      "checkoutMessage"
+    );
+
+  const body =
+    document.getElementById(
+      "checkoutBody"
+    );
+
+
+  if (
+    players.length === 0
+  ) {
+
+    table.style.display =
+      "none";
+
+    message.style.display =
+      "block";
+
+    message.textContent =
+      "No checkouts entered yet.";
 
     return;
   }
 
 
-  const body =
-  document.getElementById("checkoutBody");
-
   body.innerHTML = "";
 
 
-  players.forEach((player, index) => {
+  players.forEach(
+    (player, index) => {
 
-    const row =
-    document.createElement("tr");
-
-    row.innerHTML = `
-      <td class="position">${index + 1}</td>
-      <td>${player.player_name}</td>
-      <td>${player.team}</td>
-      <td class="stat-number">${player.highest_checkout}</td>
-    `;
-
-    body.appendChild(row);
-
-  });
+      const row =
+        document.createElement(
+          "tr"
+        );
 
 
-  document.getElementById("checkoutMessage")
-  .style.display = "none";
+      row.innerHTML = `
+        <td class="position">${index + 1}</td>
+        <td>${player.player_name}</td>
+        <td>${player.team}</td>
+        <td class="stat-number">${player.highest_checkout}</td>
+      `;
 
-  document.getElementById("checkoutTable")
-  .style.display = "table";
+
+      body.appendChild(
+        row
+      );
+
+    }
+  );
+
+
+  message.style.display =
+    "none";
+
+  table.style.display =
+    "table";
 
 }
 
 
+// ============================
 // MOST DOMINOES 3-0s
+// ============================
 
 function showDominoes(data) {
 
   const players =
-  [...data]
-  .filter(player =>
-    Number(player.dominoes_3_0s) > 0
-  )
-  .sort((a, b) =>
-    Number(b.dominoes_3_0s) -
-    Number(a.dominoes_3_0s)
-  );
+    [...data]
+      .filter(
+        player =>
+          Number(
+            player.dominoes_3_0s
+          ) > 0
+      )
+      .sort(
+        (a, b) =>
+          Number(
+            b.dominoes_3_0s
+          ) -
+          Number(
+            a.dominoes_3_0s
+          )
+      );
 
 
-  if (players.length === 0) {
+  const table =
+    document.getElementById(
+      "dominoesTable"
+    );
 
-    document.getElementById("dominoesMessage")
-    .textContent =
-    "No dominoes 3–0s entered yet.";
+  const message =
+    document.getElementById(
+      "dominoesMessage"
+    );
+
+  const body =
+    document.getElementById(
+      "dominoesBody"
+    );
+
+
+  if (
+    players.length === 0
+  ) {
+
+    table.style.display =
+      "none";
+
+    message.style.display =
+      "block";
+
+    message.textContent =
+      "No dominoes 3–0s entered yet.";
 
     return;
   }
 
 
-  const body =
-  document.getElementById("dominoesBody");
-
   body.innerHTML = "";
 
 
-  players.forEach((player, index) => {
+  players.forEach(
+    (player, index) => {
 
-    const row =
-    document.createElement("tr");
-
-    row.innerHTML = `
-      <td class="position">${index + 1}</td>
-      <td>${player.player_name}</td>
-      <td>${player.team}</td>
-      <td class="stat-number">${player.dominoes_3_0s}</td>
-    `;
-
-    body.appendChild(row);
-
-  });
+      const row =
+        document.createElement(
+          "tr"
+        );
 
 
-  document.getElementById("dominoesMessage")
-  .style.display = "none";
+      row.innerHTML = `
+        <td class="position">${index + 1}</td>
+        <td>${player.player_name}</td>
+        <td>${player.team}</td>
+        <td class="stat-number">${player.dominoes_3_0s}</td>
+      `;
 
-  document.getElementById("dominoesTable")
-  .style.display = "table";
+
+      body.appendChild(
+        row
+      );
+
+    }
+  );
+
+
+  message.style.display =
+    "none";
+
+  table.style.display =
+    "table";
 
 }
 
 
+// ============================
 // START
+// ============================
 
 loadStats();
 
