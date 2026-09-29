@@ -6,66 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Fixtures - Monday Nite League</title>
-/* =========================
-   MOBILE FRIENDLY
-   ========================= */
 
-nav {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-nav a {
-  background: #334155;
-  padding: 9px 12px;
-  border-radius: 6px;
-  margin: 0;
-}
-
-@media (max-width: 600px) {
-
-  header {
-    padding: 15px 8px;
-  }
-
-  header h1 {
-    font-size: 22px;
-  }
-
-  nav {
-    padding: 10px 5px;
-  }
-
-  nav a {
-    font-size: 14px;
-    padding: 8px 9px;
-  }
-
-  .container {
-    padding: 10px;
-  }
-
-  .card {
-    padding: 10px;
-  }
-
-  table {
-    font-size: 13px;
-  }
-
-  th,
-  td {
-    padding: 8px 5px;
-  }
-
-  button,
-  input,
-  select {
-    font-size: 16px;
-  }
-}
 <style>
 
 body {
@@ -91,13 +34,20 @@ nav {
   background: #1e293b;
   text-align: center;
   padding: 12px;
+
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 nav a {
   color: white;
   text-decoration: none;
-  margin: 8px;
   font-weight: bold;
+  background: #334155;
+  padding: 9px 12px;
+  border-radius: 6px;
 }
 
 nav a:hover {
@@ -119,6 +69,16 @@ nav a:hover {
 
 h2 {
   text-align: center;
+  color: #facc15;
+}
+
+.current-week {
+  text-align: center;
+  background: #334155;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-weight: bold;
   color: #facc15;
 }
 
@@ -160,7 +120,49 @@ td {
   font-weight: bold;
 }
 
+@media (max-width: 600px) {
+
+  header {
+    padding: 15px 8px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
+
+  nav {
+    padding: 10px 5px;
+  }
+
+  nav a {
+    font-size: 14px;
+    padding: 8px 9px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  th,
+  td {
+    padding: 8px 5px;
+  }
+
+  select {
+    font-size: 16px;
+  }
+}
+
 </style>
+
 </head>
 
 <body>
@@ -183,9 +185,18 @@ td {
 
 <h2>📅 Fixtures</h2>
 
+<div
+  id="currentWeekDisplay"
+  class="current-week"
+>
+Loading current week...
+</div>
+
 <div class="week-box">
 
-<label for="weekSelect"><strong>Select Week:</strong></label>
+<label for="weekSelect">
+<strong>Select Week:</strong>
+</label>
 
 <select id="weekSelect"></select>
 
@@ -209,7 +220,23 @@ td {
 
 </div>
 
+
 <script>
+
+const SUPABASE_URL =
+  "https://zczdgjwmewgbkgxoqplm.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_-YHYKF8Rkw-QkbRrzcW0wA_HjARVvV_";
+
+const { createClient } = supabase;
+
+const db =
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
 
 const teams = [
   "Crown A",
@@ -229,97 +256,144 @@ const teams = [
 let fixtures = [];
 
 
-// ======================================
-// CHECK IF A TEAM IS HOME
-// ======================================
+// ============================
+// HOME CHECK
+// ============================
 
 function isHome(matches, team) {
 
-  const match = matches.find(m =>
-    m.home === team || m.away === team
-  );
+  const match =
+    matches.find(
+      m =>
+        m.home === team ||
+        m.away === team
+    );
+
+  if (!match) {
+    return false;
+  }
 
   return match.home === team;
 }
 
 
-// ======================================
-// ORIENT EACH WEEK
-// Crown A / Crown B opposite home & away
-// Victoria A / Victoria B opposite
-// ======================================
+// ============================
+// ORIENT ROUND
+// ============================
 
-function orientRound(pairs, roundNumber) {
+function orientRound(
+  pairs,
+  roundNumber
+) {
 
-  let defaults = pairs.map((pair, index) => {
+  const defaults =
+    pairs.map(
+      (pair, index) => {
 
-    if ((index + roundNumber) % 2 === 0) {
+        if (
+          (index + roundNumber) % 2 === 0
+        ) {
 
-      return {
-        home: pair[0],
-        away: pair[1]
-      };
+          return {
+            home: pair[0],
+            away: pair[1]
+          };
 
-    } else {
+        }
 
-      return {
-        home: pair[1],
-        away: pair[0]
-      };
+        return {
+          home: pair[1],
+          away: pair[0]
+        };
 
-    }
-
-  });
+      }
+    );
 
 
   let best = null;
   let bestFlips = 999;
 
 
-  for (let mask = 0; mask < 64; mask++) {
+  for (
+    let mask = 0;
+    mask < 64;
+    mask++
+  ) {
 
-    let matches = defaults.map((match, index) => {
+    const matches =
+      defaults.map(
+        (match, index) => {
 
-      if (mask & (1 << index)) {
+          if (
+            mask & (1 << index)
+          ) {
 
-        return {
-          home: match.away,
-          away: match.home
-        };
+            return {
+              home: match.away,
+              away: match.home
+            };
 
-      }
+          }
 
-      return {
-        home: match.home,
-        away: match.away
-      };
+          return {
+            home: match.home,
+            away: match.away
+          };
 
-    });
+        }
+      );
 
 
     const crownsOK =
-      isHome(matches, "Crown A") !==
-      isHome(matches, "Crown B");
+      isHome(
+        matches,
+        "Crown A"
+      )
+      !==
+      isHome(
+        matches,
+        "Crown B"
+      );
 
 
     const victoriasOK =
-      isHome(matches, "Victoria A") !==
-      isHome(matches, "Victoria B");
+      isHome(
+        matches,
+        "Victoria A"
+      )
+      !==
+      isHome(
+        matches,
+        "Victoria B"
+      );
 
 
-    if (crownsOK && victoriasOK) {
+    if (
+      crownsOK &&
+      victoriasOK
+    ) {
 
       let flips = 0;
 
-      for (let i = 0; i < 6; i++) {
 
-        if (mask & (1 << i)) {
+      for (
+        let i = 0;
+        i < 6;
+        i++
+      ) {
+
+        if (
+          mask & (1 << i)
+        ) {
           flips++;
         }
 
       }
 
-      if (flips < bestFlips) {
+
+      if (
+        flips < bestFlips
+      ) {
 
         best = matches;
         bestFlips = flips;
@@ -330,34 +404,45 @@ function orientRound(pairs, roundNumber) {
 
   }
 
+
   return best;
 }
 
 
-// ======================================
-// GENERATE 11 WEEKS
-// ======================================
+// ============================
+// FIRST 11 WEEKS
+// ============================
 
 function generateFirstHalf() {
 
-  const fixedTeam = teams[0];
+  const fixedTeam =
+    teams[0];
 
-  let rotating = teams.slice(1);
+  let rotating =
+    teams.slice(1);
 
-  let rounds = [];
+  const rounds = [];
 
 
-  for (let round = 0; round < 11; round++) {
+  for (
+    let round = 0;
+    round < 11;
+    round++
+  ) {
 
     const currentTeams = [
       fixedTeam,
       ...rotating
     ];
 
-    let pairs = [];
+    const pairs = [];
 
 
-    for (let i = 0; i < 6; i++) {
+    for (
+      let i = 0;
+      i < 6;
+      i++
+    ) {
 
       pairs.push([
         currentTeams[i],
@@ -367,27 +452,31 @@ function generateFirstHalf() {
     }
 
 
-    const organisedRound =
-      orientRound(pairs, round);
-
-
-    rounds.push(organisedRound);
+    rounds.push(
+      orientRound(
+        pairs,
+        round
+      )
+    );
 
 
     const last =
       rotating.pop();
 
-    rotating.unshift(last);
+    rotating.unshift(
+      last
+    );
 
   }
+
 
   return rounds;
 }
 
 
-// ======================================
-// CREATE HOME & AWAY 22 WEEKS
-// ======================================
+// ============================
+// ALL 22 WEEKS
+// ============================
 
 function generateFixtures() {
 
@@ -396,45 +485,51 @@ function generateFixtures() {
 
 
   const secondHalf =
-    firstHalf.map(round => {
+    firstHalf.map(
+      round =>
 
-      return round.map(match => {
+        round.map(
+          match => ({
+            home: match.away,
+            away: match.home
+          })
+        )
 
-        return {
-          home: match.away,
-          away: match.home
-        };
-
-      });
-
-    });
+    );
 
 
   fixtures = [
     ...firstHalf,
     ...secondHalf
   ];
-
 }
 
 
-// ======================================
-// LOAD WEEK SELECT
-// ======================================
+// ============================
+// LOAD WEEK DROPDOWN
+// ============================
 
 function loadWeeks() {
 
-  const weekSelect =
-    document.getElementById("weekSelect");
+  const select =
+    document.getElementById(
+      "weekSelect"
+    );
 
 
-  weekSelect.innerHTML = "";
+  select.innerHTML = "";
 
 
-  for (let week = 1; week <= 22; week++) {
+  for (
+    let week = 1;
+    week <= 22;
+    week++
+  ) {
 
     const option =
-      document.createElement("option");
+      document.createElement(
+        "option"
+      );
 
     option.value =
       week - 1;
@@ -442,12 +537,14 @@ function loadWeeks() {
     option.textContent =
       "Week " + week;
 
-    weekSelect.appendChild(option);
+    select.appendChild(
+      option
+    );
 
   }
 
 
-  weekSelect.addEventListener(
+  select.addEventListener(
     "change",
     showFixtures
   );
@@ -455,54 +552,137 @@ function loadWeeks() {
 }
 
 
-// ======================================
+// ============================
 // SHOW FIXTURES
-// ======================================
+// ============================
 
 function showFixtures() {
 
   const week =
     Number(
-      document.getElementById("weekSelect").value
+      document.getElementById(
+        "weekSelect"
+      ).value
     );
 
 
   const table =
-    document.getElementById("fixturesTable");
+    document.getElementById(
+      "fixturesTable"
+    );
 
 
   table.innerHTML = "";
 
 
-  fixtures[week].forEach(match => {
+  fixtures[week]
+  .forEach(
+    match => {
 
-    const row =
-      document.createElement("tr");
-
-
-    row.innerHTML = `
-      <td class="home">${match.home}</td>
-      <td class="vs">V</td>
-      <td>${match.away}</td>
-    `;
+      const row =
+        document.createElement(
+          "tr"
+        );
 
 
-    table.appendChild(row);
+      row.innerHTML = `
+        <td class="home">${match.home}</td>
+        <td class="vs">V</td>
+        <td>${match.away}</td>
+      `;
 
-  });
+
+      table.appendChild(
+        row
+      );
+
+    }
+  );
 
 }
 
 
-// ======================================
-// START PAGE
-// ======================================
+// ============================
+// LOAD CURRENT WEEK
+// ============================
+
+async function loadCurrentWeek() {
+
+  const display =
+    document.getElementById(
+      "currentWeekDisplay"
+    );
+
+
+  const select =
+    document.getElementById(
+      "weekSelect"
+    );
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("league_settings")
+      .select("current_week")
+      .eq("id", 1)
+      .single();
+
+
+  if (error) {
+
+    display.textContent =
+      "Current Week";
+
+    select.value = 0;
+
+    showFixtures();
+
+    return;
+  }
+
+
+  let currentWeek =
+    Number(
+      data.current_week
+    );
+
+
+  if (
+    currentWeek < 1 ||
+    currentWeek > 22
+  ) {
+
+    currentWeek = 1;
+
+  }
+
+
+  display.textContent =
+    "📅 Current League Week: Week " +
+    currentWeek;
+
+
+  select.value =
+    currentWeek - 1;
+
+
+  showFixtures();
+
+}
+
+
+// ============================
+// START
+// ============================
 
 generateFixtures();
 
 loadWeeks();
 
-showFixtures();
+loadCurrentWeek();
 
 </script>
 
