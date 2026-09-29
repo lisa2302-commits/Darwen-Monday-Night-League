@@ -34,7 +34,6 @@ nav {
   background: #1e293b;
   text-align: center;
   padding: 12px;
-
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -115,9 +114,10 @@ td {
   font-weight: bold;
 }
 
-.vs {
+.middle {
   color: #facc15;
   font-weight: bold;
+  font-size: 18px;
 }
 
 @media (max-width: 600px) {
@@ -185,10 +185,7 @@ td {
 
 <h2>📅 Fixtures</h2>
 
-<div
-  id="currentWeekDisplay"
-  class="current-week"
->
+<div id="currentWeekDisplay" class="current-week">
 Loading current week...
 </div>
 
@@ -207,7 +204,7 @@ Loading current week...
 <thead>
 <tr>
 <th>Home</th>
-<th></th>
+<th>Score</th>
 <th>Away</th>
 </tr>
 </thead>
@@ -253,7 +250,10 @@ const teams = [
   "Victoria B"
 ];
 
+
 let fixtures = [];
+
+let savedResults = [];
 
 
 // ============================
@@ -404,7 +404,6 @@ function orientRound(
 
   }
 
-
   return best;
 }
 
@@ -553,17 +552,51 @@ function loadWeeks() {
 
 
 // ============================
+// LOAD SAVED RESULTS
+// ============================
+
+async function loadResults() {
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("results")
+      .select("*");
+
+
+  if (error) {
+
+    savedResults = [];
+
+    return;
+
+  }
+
+
+  savedResults =
+    data || [];
+
+}
+
+
+// ============================
 // SHOW FIXTURES
 // ============================
 
 function showFixtures() {
 
-  const week =
+  const weekIndex =
     Number(
       document.getElementById(
         "weekSelect"
       ).value
     );
+
+
+  const weekNumber =
+    weekIndex + 1;
 
 
   const table =
@@ -575,9 +608,31 @@ function showFixtures() {
   table.innerHTML = "";
 
 
-  fixtures[week]
+  fixtures[weekIndex]
   .forEach(
     match => {
+
+      const saved =
+        savedResults.find(
+          result =>
+            Number(result.week) === weekNumber &&
+            result.home_team === match.home &&
+            result.away_team === match.away
+        );
+
+
+      let middleText = "V";
+
+
+      if (saved) {
+
+        middleText =
+          saved.home_score +
+          " - " +
+          saved.away_score;
+
+      }
+
 
       const row =
         document.createElement(
@@ -587,7 +642,7 @@ function showFixtures() {
 
       row.innerHTML = `
         <td class="home">${match.home}</td>
-        <td class="vs">V</td>
+        <td class="middle">${middleText}</td>
         <td>${match.away}</td>
       `;
 
@@ -634,13 +689,14 @@ async function loadCurrentWeek() {
   if (error) {
 
     display.textContent =
-      "Current Week";
+      "📅 Current League Week";
 
     select.value = 0;
 
     showFixtures();
 
     return;
+
   }
 
 
@@ -678,11 +734,20 @@ async function loadCurrentWeek() {
 // START
 // ============================
 
-generateFixtures();
+async function startPage() {
 
-loadWeeks();
+  generateFixtures();
 
-loadCurrentWeek();
+  loadWeeks();
+
+  await loadResults();
+
+  await loadCurrentWeek();
+
+}
+
+
+startPage();
 
 </script>
 
