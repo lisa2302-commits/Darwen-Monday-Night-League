@@ -10,7 +10,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
 body {
   font-family: Arial, sans-serif;
   background: #111827;
@@ -159,7 +158,6 @@ td {
     font-size: 16px;
   }
 }
-
 </style>
 </head>
 
@@ -174,7 +172,6 @@ td {
 <a href="fixtures.html">📅 Fixtures</a>
 <a href="results.html">📝 Results</a>
 <a href="stats.html">📊 Stats</a>
-
 </nav>
 
 <div class="container">
@@ -206,7 +203,6 @@ Loading current week...
 </div>
 
 <script>
-
 const SUPABASE_URL =
   "https://zczdgjwmewgbkgxoqplm.supabase.co";
 
@@ -219,178 +215,805 @@ const db =
     SUPABASE_KEY
   );
 
-const teams = [
-  "Crown A",
-  "Punch",
-  "ICI",
-  "The Anchor",
-  "The Park Inn",
-  "Bird in Hand",
-  "Victoria A",
-  "Two Gates Club",
-  "Funky Room",
-  "Entwistle",
-  "Crown B",
-  "Victoria B",
-  "Coopers Bar",
-  "Darwen Football Club"
+const TOTAL_WEEKS = 26;
+
+const FIXTURE_SCHEDULE = [
+  [
+    {
+      "home": "Darwen Football Club",
+      "away": "Crown A"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Punch"
+    },
+    {
+      "home": "ICI",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Crown B",
+      "away": "The Anchor"
+    },
+    {
+      "home": "Entwistle",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Two Gates Club"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Punch",
+      "away": "Crown B"
+    },
+    {
+      "home": "ICI",
+      "away": "Entwistle"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Funky Room"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Victoria A"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Crown B"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Punch"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "ICI"
+    },
+    {
+      "home": "Victoria A",
+      "away": "The Anchor"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "The Park Inn"
+    }
+  ],
+  [
+    {
+      "home": "Crown B",
+      "away": "Crown A"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Punch",
+      "away": "Victoria A"
+    },
+    {
+      "home": "ICI",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "The Anchor"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Crown B"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Punch",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "The Anchor",
+      "away": "ICI"
+    }
+  ],
+  [
+    {
+      "home": "Funky Room",
+      "away": "Crown A"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Crown B",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "The Anchor"
+    },
+    {
+      "home": "ICI",
+      "away": "Punch"
+    }
+  ],
+  [
+    {
+      "home": "Two Gates Club",
+      "away": "Crown A"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Crown B",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "ICI"
+    },
+    {
+      "home": "Punch",
+      "away": "Darwen Football Club"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Entwistle",
+      "away": "The Anchor"
+    },
+    {
+      "home": "ICI",
+      "away": "Crown B"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Punch"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Coopers Bar"
+    }
+  ],
+  [
+    {
+      "home": "Bird in Hand",
+      "away": "Crown A"
+    },
+    {
+      "home": "Victoria A",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Funky Room",
+      "away": "ICI"
+    },
+    {
+      "home": "Punch",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Crown B",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Victoria B"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "The Anchor"
+    },
+    {
+      "home": "ICI",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Punch"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Crown B"
+    }
+  ],
+  [
+    {
+      "home": "The Anchor",
+      "away": "Crown A"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "ICI"
+    },
+    {
+      "home": "Punch",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Crown B",
+      "away": "Entwistle"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "ICI"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Punch"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Crown B"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Funky Room"
+    }
+  ],
+  [
+    {
+      "home": "Punch",
+      "away": "Crown A"
+    },
+    {
+      "home": "ICI",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "The Anchor"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Crown B",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Two Gates Club"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Punch",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Victoria B",
+      "away": "ICI"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Crown B"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Victoria A"
+    }
+  ],
+  [
+    {
+      "home": "Coopers Bar",
+      "away": "Crown A"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Crown B",
+      "away": "Punch"
+    },
+    {
+      "home": "Entwistle",
+      "away": "ICI"
+    },
+    {
+      "home": "Funky Room",
+      "away": "The Anchor"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Bird in Hand"
+    }
+  ],
+  [
+    {
+      "home": "Victoria B",
+      "away": "Crown A"
+    },
+    {
+      "home": "Crown B",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Punch",
+      "away": "Funky Room"
+    },
+    {
+      "home": "ICI",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Victoria A"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Bird in Hand"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Crown B"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Punch"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "ICI"
+    },
+    {
+      "home": "The Anchor",
+      "away": "The Park Inn"
+    }
+  ],
+  [
+    {
+      "home": "Entwistle",
+      "away": "Crown A"
+    },
+    {
+      "home": "Crown B",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Punch"
+    },
+    {
+      "home": "ICI",
+      "away": "The Anchor"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Crown B"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Punch",
+      "away": "ICI"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Crown B"
+    },
+    {
+      "home": "Victoria B",
+      "away": "The Anchor"
+    },
+    {
+      "home": "ICI",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Punch"
+    }
+  ],
+  [
+    {
+      "home": "Victoria A",
+      "away": "Crown A"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Funky Room",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Crown B",
+      "away": "ICI"
+    },
+    {
+      "home": "Punch",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Darwen Football Club"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "The Anchor"
+    },
+    {
+      "home": "ICI",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Punch"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Crown B"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Coopers Bar"
+    }
+  ],
+  [
+    {
+      "home": "The Park Inn",
+      "away": "Crown A"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "Victoria A",
+      "away": "ICI"
+    },
+    {
+      "home": "Punch",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Entwistle"
+    },
+    {
+      "home": "Crown B",
+      "away": "Victoria B"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "The Anchor"
+    },
+    {
+      "home": "ICI",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Punch"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Victoria B",
+      "away": "Funky Room"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Crown B"
+    }
+  ],
+  [
+    {
+      "home": "ICI",
+      "away": "Crown A"
+    },
+    {
+      "home": "Punch",
+      "away": "The Anchor"
+    },
+    {
+      "home": "The Park Inn",
+      "away": "Darwen Football Club"
+    },
+    {
+      "home": "Coopers Bar",
+      "away": "Bird in Hand"
+    },
+    {
+      "home": "Victoria A",
+      "away": "Victoria B"
+    },
+    {
+      "home": "Crown B",
+      "away": "Two Gates Club"
+    },
+    {
+      "home": "Funky Room",
+      "away": "Entwistle"
+    }
+  ],
+  [
+    {
+      "home": "Crown A",
+      "away": "Punch"
+    },
+    {
+      "home": "Darwen Football Club",
+      "away": "ICI"
+    },
+    {
+      "home": "The Anchor",
+      "away": "Coopers Bar"
+    },
+    {
+      "home": "Victoria B",
+      "away": "The Park Inn"
+    },
+    {
+      "home": "Bird in Hand",
+      "away": "Crown B"
+    },
+    {
+      "home": "Entwistle",
+      "away": "Victoria A"
+    },
+    {
+      "home": "Two Gates Club",
+      "away": "Funky Room"
+    }
+  ]
 ];
 
-const WEEKS_PER_HALF = teams.length - 1;
-const MATCHES_PER_WEEK = teams.length / 2;
-const TOTAL_WEEKS = WEEKS_PER_HALF * 2;
-
-let fixtures = [];
 let savedResults = [];
 
-function isHome(matches, team) {
-  const match = matches.find(
-    m => m.home === team || m.away === team
-  );
-
-  return match ? match.home === team : false;
-}
-
-function orientRound(pairs, roundNumber) {
-
-  const defaults = pairs.map((pair, index) => {
-    if ((index + roundNumber) % 2 === 0) {
-      return {
-        home: pair[0],
-        away: pair[1]
-      };
-    }
-
-    return {
-      home: pair[1],
-      away: pair[0]
-    };
-  });
-
-  let best = defaults;
-  let bestFlips = Infinity;
-  const combinations = 1 << pairs.length;
-
-  for (let mask = 0; mask < combinations; mask++) {
-
-    const matches = defaults.map((match, index) => {
-      if (mask & (1 << index)) {
-        return {
-          home: match.away,
-          away: match.home
-        };
-      }
-
-      return {
-        home: match.home,
-        away: match.away
-      };
-    });
-
-    const crownsOK =
-      isHome(matches, "Crown A") !==
-      isHome(matches, "Crown B");
-
-    const victoriasOK =
-      isHome(matches, "Victoria A") !==
-      isHome(matches, "Victoria B");
-
-    if (crownsOK && victoriasOK) {
-      let flips = 0;
-
-      for (let i = 0; i < pairs.length; i++) {
-        if (mask & (1 << i)) {
-          flips++;
-        }
-      }
-
-      if (flips < bestFlips) {
-        best = matches;
-        bestFlips = flips;
-      }
-    }
-  }
-
-  return best;
-}
-
-function generateFirstHalf() {
-
-  const fixedTeam = teams[0];
-  let rotating = teams.slice(1);
-  const rounds = [];
-
-  for (let round = 0; round < WEEKS_PER_HALF; round++) {
-
-    const current = [
-      fixedTeam,
-      ...rotating
-    ];
-
-    const pairs = [];
-
-    for (let i = 0; i < MATCHES_PER_WEEK; i++) {
-      pairs.push([
-        current[i],
-        current[current.length - 1 - i]
-      ]);
-    }
-
-    rounds.push(
-      orientRound(
-        pairs,
-        round
-      )
-    );
-
-    rotating.unshift(
-      rotating.pop()
-    );
-  }
-
-  return rounds;
-}
-
-function generateFixtures() {
-
-  const firstHalf =
-    generateFirstHalf();
-
-  const secondHalf =
-    firstHalf.map(
-      round =>
-        round.map(
-          match => ({
-            home: match.away,
-            away: match.home
-          })
-        )
-    );
-
-  fixtures = [
-    ...firstHalf,
-    ...secondHalf
-  ];
-}
-
 function loadWeeks() {
-
   const select =
     document.getElementById("weekSelect");
 
   select.innerHTML = "";
 
   for (let week = 1; week <= TOTAL_WEEKS; week++) {
-
     const option =
       document.createElement("option");
 
-    option.value =
-      week - 1;
-
-    option.textContent =
-      "Week " + week;
-
+    option.value = week - 1;
+    option.textContent = "Week " + week;
     select.appendChild(option);
   }
 
@@ -401,7 +1024,6 @@ function loadWeeks() {
 }
 
 async function loadResults() {
-
   const {
     data,
     error
@@ -415,7 +1037,6 @@ async function loadResults() {
 }
 
 function showFixtures() {
-
   const weekIndex =
     Number(
       document.getElementById("weekSelect").value
@@ -429,9 +1050,8 @@ function showFixtures() {
 
   table.innerHTML = "";
 
-  fixtures[weekIndex]
+  FIXTURE_SCHEDULE[weekIndex]
   .forEach(match => {
-
     const saved =
       savedResults.find(
         result =>
@@ -459,7 +1079,6 @@ function showFixtures() {
 }
 
 async function loadCurrentWeek() {
-
   const display =
     document.getElementById("currentWeekDisplay");
 
@@ -477,9 +1096,7 @@ async function loadCurrentWeek() {
       .single();
 
   let currentWeek =
-    error
-      ? 1
-      : Number(data.current_week);
+    error ? 1 : Number(data.current_week);
 
   if (
     currentWeek < 1 ||
@@ -499,14 +1116,12 @@ async function loadCurrentWeek() {
 }
 
 async function startPage() {
-  generateFixtures();
   loadWeeks();
   await loadResults();
   await loadCurrentWeek();
 }
 
 startPage();
-
 </script>
 
 </body>
